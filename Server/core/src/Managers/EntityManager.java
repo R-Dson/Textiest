@@ -16,6 +16,11 @@ public class EntityManager {
         }
     }
 
+    public void RemoveUserIdentity(UserIdentity identity){
+        identity.currentLayer.RemoveUserFromLayer(identity);
+        EntityList.remove(identity);
+    }
+
     public UEntity getEntityByUniqueID(final String uniqueID){
         for (UEntity e: EntityList) {
             if (e instanceof UserIdentity) {
@@ -27,7 +32,7 @@ public class EntityManager {
         return null;
     }
 
-    public UserIdentity getEntityByConnectID(final int connectID){
+    public UserIdentity getUserIdentityByConnectID(final int connectID){
         for (UEntity e: EntityList) {
             if (e instanceof UserIdentity) {
                 if (((UserIdentity)e).connectionID == connectID)

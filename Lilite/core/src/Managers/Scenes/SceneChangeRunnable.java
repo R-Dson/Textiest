@@ -2,6 +2,7 @@ package Managers.Scenes;
 
 import Managers.Networking.NetworkingMessages.SceneNameEnum;
 import com.esotericsoftware.kryonet.Client;
+import com.vaniljstudio.lilite.Lilite;
 
 public class SceneChangeRunnable implements Runnable{
     private SceneNameEnum sceneNameEnum;
@@ -21,6 +22,8 @@ public class SceneChangeRunnable implements Runnable{
             case MainScene:
                 com.vaniljstudio.lilite.Lilite.CurrentScene = new MainScene(_client);
                 break;
+            case LoginScene:
+                Lilite.CurrentScene = new LoginScene();
         }
     }
 }

@@ -2,5 +2,6 @@ package Managers.Networking.NetworkingMessages;
 
 public enum SceneNameEnum {
     CharacterCreationScene,
-    MainScene
+    MainScene,
+    LoginScene
 }

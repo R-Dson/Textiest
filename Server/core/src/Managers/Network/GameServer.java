@@ -96,7 +96,12 @@ public class GameServer {
 
         @Override
         public void disconnected(Connection connection) {
-            EntityManager.getEntityByConnectID(connection.getID());
+            UserIdentity identity = EntityManager.getUserIdentityByConnectID(connection.getID());
+
+            String jsonString = json.toJson(identity.playerData);
+            SQLManager.UpdateData(identity.UserName, jsonString);
+
+            EntityManager.RemoveUserIdentity(identity);
         }
 
         @Override
@@ -114,11 +119,25 @@ public class GameServer {
             else if (obj instanceof UpdatePackageToServer){
                 UpdatePackageToServer upts = (UpdatePackageToServer)obj;
                 if (!upts.inputsAsIntegers.isEmpty()){
-                    UserIdentity ui = EntityManager.getEntityByConnectID(connection.getID());
+                    UserIdentity ui = EntityManager.getUserIdentityByConnectID(connection.getID());
                     InputManager.CalculateMovement(ui, upts.inputsAsIntegers);
                 }
             }
             else if (obj instanceof CreationRequest){
+                CreationRequest cr = (CreationRequest)obj;
+
+                UserIdentity identity = EntityManager.getUserIdentityByConnectID(connection.getID());
+                identity.playerData.playerTextureName = cr.playerData.playerTextureName;
+                //identity.playerData.playerTextureID = cr.playerData.playerTextureID;
+                identity.playerData.Name = identity.UserName + "." + cr.playerData.Name;
+
+                identity.playerData.doneCharacterCreation = true;
+
+                String jsonString = json.toJson(identity.playerData);
+                SQLManager.UpdateData(identity.UserName, jsonString);
+                ChangeScene changeScene = new ChangeScene();
+                changeScene.sceneName = SceneNameEnum.MainScene;
+                connection.sendTCP(changeScene);
 
             }
             else if (obj instanceof AssignRequest)
@@ -143,11 +162,7 @@ public class GameServer {
 
                     Json json = new Json();
                     PlayerData dataSQL = json.fromJson(PlayerData.class, data);
-                    /*dataSQL.CurrentHealth = 100;
-                    dataSQL.MaxHealth = 100;
-                    dataSQL.Name = "sef";
-                    dataSQL.doneCharacterCreation = true;
-                    dataSQL.isChanneling = false;*/
+                    dataSQL.UserName = request.Username;
 
                     LoginResult result = new LoginResult();
 
@@ -156,14 +171,18 @@ public class GameServer {
 
                     //Change client scene
                     ChangeScene changeScene = new ChangeScene();
-                    changeScene.sceneName = SceneNameEnum.MainScene;
-                    if (true)
+                    //assign to a map and layer
+                    UserIdentity identity = new UserIdentity(request.UniqueID, connection.getID());
+                    identity.UserName = request.Username;
+                    identity.playerData = dataSQL;
+                    ToBeAssigned.add(identity);
+
+                    if (result.data.doneCharacterCreation)
                     {
-                        //assign to a map and layer
-                        UserIdentity identity = new UserIdentity(request.UniqueID, connection.getID());
-                        identity.UserName = request.Username;
-                        identity.playerData = dataSQL;
-                        ToBeAssigned.add(identity);
+                        changeScene.sceneName = SceneNameEnum.MainScene;
+                    }
+                    else {
+                        changeScene.sceneName = SceneNameEnum.CharacterCreationScene;
                     }
 
                     connection.sendTCP(changeScene);
@@ -197,6 +216,9 @@ public class GameServer {
             ConnectionEstablished ce = new ConnectionEstablished();
             ce.text = uniqueID;
             connection.sendTCP(ce);
+            ChangeScene changeScene = new ChangeScene();
+            changeScene.sceneName = SceneNameEnum.LoginScene;
+            connection.sendTCP(changeScene);
         }
 
         private Json json = new Json();

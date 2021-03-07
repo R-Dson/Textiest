@@ -36,18 +36,16 @@ public class LoginScene extends Scene {
 
         VisTextButton login = new VisTextButton("Login");
         VisTextButton register = new VisTextButton("Register");
-        boolean isConnected = CheckConnection();
-
+        //boolean isConnected = CheckConnection();
         login.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                boolean isConnected = CheckConnection();
-                if (isConnected){
+                if (true){
                     LoginRequest request = new LoginRequest();
                     String usernameText = username.getText();
                     String passwordText = password.getText();
                     request.Password = "test";
-                    request.Username = "t66";
+                    request.Username = "t69";
                     //request.Username = "t";
                     //request.Password = "t";
                     request.UniqueID = com.vaniljstudio.lilite.Lilite.uniqueID;
@@ -62,7 +60,7 @@ public class LoginScene extends Scene {
                 if (CheckConnection()){
                     RegisterRequest req = new RegisterRequest();
                     req.Password = "test";
-                    req.Username = "t66";
+                    req.Username = "t69";
                     client.getClient().sendTCP(req);
                     //TODO Change later to username text
 

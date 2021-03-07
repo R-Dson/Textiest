@@ -1,5 +1,6 @@
 package Managers.Scenes;
 
+import Data.PlayerData;
 import Data.StaticValues;
 import Managers.Animation.Animation;
 import Managers.DataManager;
@@ -91,6 +92,7 @@ public class CharacterCreationScene extends Scene{
         PlayerManager.playerData.Name = characterName;
 
         CreationRequest request = new CreationRequest();
+
         request.playerData = PlayerManager.playerData;
         _client.sendTCP(request);
     }

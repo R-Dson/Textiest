@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PlayerData {
     //Information
+    public String UserName;
     public String Name;
     public String LastMultiLocation;
     public String targetName;

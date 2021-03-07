@@ -28,6 +28,7 @@ public class GameClient {
 
     public static boolean ConnectedToServer = false;
 
+
     public void StartClient() {
 
         InitClient();
@@ -85,9 +86,9 @@ public class GameClient {
         boolean connected = Connect();
         int attempts = 0;
 
-        while (!connected && attempts < 5){
+        while (!connected && attempts < 1){
             AttemptTimer += Gdx.graphics.getDeltaTime();
-            if(AttemptTimer > 3){
+            if(AttemptTimer > 0){
                 attempts++;
                 Gdx.app.log("NETWORK_ERROR", "Attempting to connect! Total attempts: " + attempts);
                 connected = Connect();
@@ -148,11 +149,6 @@ public class GameClient {
 
                 if(Lresult.result == LoginEnum.SUCCESS){
                     PlayerManager.playerData = Lresult.data;
-
-                    //if (Lresult.sceneName == SceneNameEnum.CharacterCreationScene)
-                        //com.skylight.game.Client.CurrentScene = new CharacterCreationScene(client);
-                    //else if (Lresult.sceneName == SceneNameEnum.MainScene)
-                    //   com.skylight.game.Client.CurrentScene = new MainScene(client);
                 }
                 else if (Lresult.result == LoginEnum.FAIL){
                     //Error wrong info
@@ -174,9 +170,6 @@ public class GameClient {
 
         private void SetUpID(ConnectionEstablished ce){
             com.vaniljstudio.lilite.Lilite.uniqueID = ce.text;
-            //TODO Change later to username text
-
-
         }
     }
 

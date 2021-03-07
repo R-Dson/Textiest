@@ -3,6 +3,7 @@ package com.vaniljstudio.lilite;
 import Data.StaticValues;
 import Managers.DataManager;
 import Managers.Networking.GameClient;
+import Managers.Scenes.ConnectionScene;
 import Managers.Scenes.LoginScene;
 import Managers.Scenes.MainScene;
 import Managers.Scenes.Scene;
@@ -33,7 +34,7 @@ public class Lilite extends ApplicationAdapter {
 		//Starts the client
 		GameClient.StartClient();
 
-		CurrentScene = new LoginScene();
+		CurrentScene = new ConnectionScene();
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PlayerData {
     //Information
+    public String UserName;
     public String Name;
     public String LastMultiLocation;
     public String targetName;
@@ -36,9 +37,9 @@ public class PlayerData {
 
     public void AddItemToInventory(EquipmentItem item){
         if (Inventory == null) return;
-        int lowestpos = ItemManager.FindFirstNullInArray(Inventory);
-        if (lowestpos != -1)
-            Inventory[lowestpos] = item;
+        int lowest = ItemManager.FindFirstNullInArray(Inventory);
+        if (lowest != -1)
+            Inventory[lowest] = item;
     }
 
     public void UnEquip(EquipmentItem item){
