@@ -126,8 +126,6 @@ public class GameServer {
 
             }
 
-
-
         }
 
         private void loginRequest(Connection connection, Object obj){
@@ -145,8 +143,14 @@ public class GameServer {
 
                     Json json = new Json();
                     PlayerData dataSQL = json.fromJson(PlayerData.class, data);
+                    /*dataSQL.CurrentHealth = 100;
+                    dataSQL.MaxHealth = 100;
+                    dataSQL.Name = "sef";
+                    dataSQL.doneCharacterCreation = true;
+                    dataSQL.isChanneling = false;*/
 
                     LoginResult result = new LoginResult();
+
                     result.data = dataSQL;
                     result.result = LoginEnum.SUCCESS;
 
@@ -162,7 +166,7 @@ public class GameServer {
                         ToBeAssigned.add(identity);
                     }
 
-                    //connection.sendTCP(changeScene);
+                    connection.sendTCP(changeScene);
                     connection.sendTCP(result);
                     //Else not registered
 

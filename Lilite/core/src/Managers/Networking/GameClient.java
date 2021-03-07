@@ -75,7 +75,7 @@ public class GameClient {
             if (!client.isConnected())
             {
                 client.close();
-                com.vaniljstudio.lilite.Lilite.CurrentScene = new LoginScene(this);
+                com.vaniljstudio.lilite.Lilite.CurrentScene = new LoginScene();
             }
             UpdateTimer -= 1/20f;
         }
@@ -176,11 +176,7 @@ public class GameClient {
             com.vaniljstudio.lilite.Lilite.uniqueID = ce.text;
             //TODO Change later to username text
 
-            LoginRequest request = new LoginRequest();
-            request.Password = "test";
-            request.Username = "tre4";
-            request.UniqueID = com.vaniljstudio.lilite.Lilite.uniqueID;
-            client.sendTCP(request);
+
         }
     }
 

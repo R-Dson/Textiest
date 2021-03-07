@@ -16,6 +16,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.vaniljstudio.lilite.Lilite;
 
 public class LoginScene extends Scene {
 
@@ -23,12 +24,9 @@ public class LoginScene extends Scene {
     private Texture texture;
     private GameClient client;
 
-    public LoginScene(GameClient client){
-        this.client = client;
-    }
-
     @Override
     public void create() {
+        client = Lilite.GameClient;
 
         final VisLabel userLabel = new VisLabel("Username");
         VisLabel pswLabel = new VisLabel("Password");
@@ -38,6 +36,7 @@ public class LoginScene extends Scene {
 
         VisTextButton login = new VisTextButton("Login");
         VisTextButton register = new VisTextButton("Register");
+        boolean isConnected = CheckConnection();
 
         login.addListener(new ChangeListener() {
             @Override
@@ -47,8 +46,12 @@ public class LoginScene extends Scene {
                     LoginRequest request = new LoginRequest();
                     String usernameText = username.getText();
                     String passwordText = password.getText();
-
-
+                    request.Password = "test";
+                    request.Username = "t66";
+                    //request.Username = "t";
+                    //request.Password = "t";
+                    request.UniqueID = com.vaniljstudio.lilite.Lilite.uniqueID;
+                    client.getClient().sendTCP(request);
                 }
             }
         });
@@ -59,14 +62,14 @@ public class LoginScene extends Scene {
                 if (CheckConnection()){
                     RegisterRequest req = new RegisterRequest();
                     req.Password = "test";
-                    req.Username = "tre4";
+                    req.Username = "t66";
                     client.getClient().sendTCP(req);
                     //TODO Change later to username text
 
-                    LoginRequest request = new LoginRequest();
+                    /*LoginRequest request = new LoginRequest();
                     request.Password = "test";
                     request.Username = "tre4";
-                    request.UniqueID = com.vaniljstudio.lilite.Lilite.uniqueID;
+                    request.UniqueID = com.vaniljstudio.lilite.Lilite.uniqueID;*/
                     //client.getClient().sendTCP(request);
                 }
             }

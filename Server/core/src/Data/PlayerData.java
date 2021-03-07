@@ -19,6 +19,7 @@ public class PlayerData {
 
     //textures
     public int playerTextureID = -1;
+    public String playerTextureName;
 
     public EquipmentItem[] Equipment;
     public EquipmentItem[] Inventory;

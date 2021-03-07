@@ -16,8 +16,8 @@ public class Lilite extends ApplicationAdapter {
 	SpriteBatch batch;
 	private float timer60;
 
-	private GameClient _GameClient;
-	private DataManager _DataManager;
+	public static GameClient GameClient;
+	public static DataManager DataManager;
 
 	public static String uniqueID;
 	public static Scene CurrentScene;
@@ -25,15 +25,15 @@ public class Lilite extends ApplicationAdapter {
 	@Override
 	public void create () {
 		//Initiate functions
-		_GameClient = new GameClient();
+		GameClient = new GameClient();
 
 		batch = new SpriteBatch();
-		_DataManager = new DataManager();
+		DataManager = new DataManager();
 
 		//Starts the client
-		_GameClient.StartClient();
+		GameClient.StartClient();
 
-		CurrentScene = new LoginScene(_GameClient);
+		CurrentScene = new LoginScene();
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class Lilite extends ApplicationAdapter {
 
 		//Update client
 		if (CurrentScene instanceof MainScene)
-			_GameClient.Update(delta);
+			GameClient.Update(delta);
 
 		//Updates the scene on a fixed value
 		if (timer60 >= StaticValues.updateFrequency){

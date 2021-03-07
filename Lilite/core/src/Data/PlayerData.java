@@ -21,4 +21,6 @@ public class PlayerData {
 
     public EquipmentItem[] Equipment;
     public EquipmentItem[] Inventory;
+
+    public boolean doneCharacterCreation = false;
 }
