@@ -100,7 +100,6 @@ public class GameServer {
 
             String jsonString = json.toJson(identity.playerData);
             SQLManager.UpdateData(identity.UserName, jsonString);
-
             EntityManager.RemoveUserIdentity(identity);
         }
 

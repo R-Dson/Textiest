@@ -25,6 +25,7 @@ public class Animation {
         _animationTexture.BackSplits = _animationTexture.FullBack.split(_textureWidth, _textureWidth);
         _animationTexture.SideSplits = _animationTexture.FullSide.split(_textureWidth, _textureWidth);
         _animationTexture.FrontSplits = _animationTexture.FullFront.split(_textureWidth, _textureWidth);
+        TextureToCurrent(textureCounter, _animationTexture.FrontSplits);
     }
 
     public Animation(AnimationTextures animationTexture, float frequency){

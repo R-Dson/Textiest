@@ -16,22 +16,24 @@ public class CameraManager extends OrthographicCamera {
     public void create(MapManager mapManager){
         //TODO: Change to width and height
         _Camera = new OrthographicCamera(1320f, 1180f);
-        //_Camera.zoom -= 0.95;
+        _Camera.zoom -= 0.9825f;
         //TODO: Set position to character when logged in
         _Camera.position.x = 0;
-        _Camera.position.y = 80;
+        _Camera.position.y = 0;
+        _Camera.update();
     }
+
     final float speed=0.1f,ispeed=1.0f-speed;
+
     public void render(SpriteBatch batch){
         if (_Camera != null){
             Vector3 cameraPosition = _Camera.position;
             targetPosition = PlayerManager.playerData.PlayerPosition.cpy();
-
             //TODO: FIX CAMERA ASAP
             cameraPosition.scl(ispeed);
             targetPosition.scl(speed);
             cameraPosition.add(new Vector3(targetPosition.x, targetPosition.y, 0));
-            _Camera.position.set(cameraPosition);
+            _Camera.update();
             System.out.println(targetPosition + " : " + cameraPosition);
         }
     }
