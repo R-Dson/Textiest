@@ -90,7 +90,7 @@ public class SQLManager {
     public void UpdateData(String username, String data){
         try(Connection connection = DriverManager.getConnection(_fullURL, _ID, _ConnectionCredential))
         {
-            String query = "UPDATE Users SET accountData = ? WHERE accountInfo = ?";
+            String query = "UPDATE users SET accountData = ? WHERE accountInfo = ?";
             PreparedStatement pstmt = connection.prepareStatement(query);
             pstmt.setString(1, data);
             pstmt.setString(2, username);

@@ -11,9 +11,11 @@ public class Animation {
     private final int textureCount;
     private Direction _direction;
     private boolean _directionChanged;
+    private boolean _isMoving;
 
     private final AnimationTextures _animationTexture;
     private TextureRegion _TextureRegion;
+    private float _Scale;
 
     public Animation(AnimationTextures animationTexture){
         _animationTexture = animationTexture;
@@ -62,6 +64,7 @@ public class Animation {
             if (_animationTexture != null)
             {
 
+
                 if (_directionChanged || textureCounter >= textureCount)
                     textureCounter = 0;
 
@@ -70,6 +73,9 @@ public class Animation {
                     _animationTexture.FullSide.flip(false, false);
                 else if (_directionChanged && _direction == Direction.RIGHT)
                     _animationTexture.FullSide.flip(true, false);
+
+                if (!_isMoving)
+                    textureCounter = 0;
 
                 if (_directionChanged)
                     _directionChanged = false;
@@ -114,5 +120,25 @@ public class Animation {
 
     public TextureRegion GetCurrentTextureRegion(){
         return _TextureRegion;
+    }
+
+    public Direction get_direction() {
+        return _direction;
+    }
+
+    public float get_Scale() {
+        return _Scale;
+    }
+
+    public void set_Scale(float _Scale) {
+        this._Scale = _Scale;
+    }
+
+    public boolean is_isMoving() {
+        return _isMoving;
+    }
+
+    public void set_isMoving(boolean _isMoving) {
+        this._isMoving = _isMoving;
     }
 }

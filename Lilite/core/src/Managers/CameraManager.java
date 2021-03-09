@@ -23,7 +23,7 @@ public class CameraManager extends OrthographicCamera {
         _Camera.update();
     }
 
-    final float speed=0.1f,ispeed=1.0f-speed;
+    final float speed=0.25f,ispeed=1.0f-speed;
 
     public void render(SpriteBatch batch){
         if (_Camera != null){

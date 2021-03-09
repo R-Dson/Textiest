@@ -87,11 +87,19 @@ public class Map {
     }
 
     public void MoveUserToNewMap(UserIdentity userIdentity, Map newMap){
+        /*Body body = userIdentity.entity.getComponent(B2dBodyComponent.class).body;
+        if (body != null)
+            world.destroyBody(body);
+        userIdentity.currentLayer.RemoveUserFromLayer(userIdentity);*/
+        DestroyBodyOfUserIdentity(userIdentity);
+        newMap.AssignUserToLayer(userIdentity);
+    }
+
+    public void DestroyBodyOfUserIdentity(UserIdentity userIdentity){
         Body body = userIdentity.entity.getComponent(B2dBodyComponent.class).body;
         if (body != null)
             world.destroyBody(body);
         userIdentity.currentLayer.RemoveUserFromLayer(userIdentity);
-        newMap.AssignUserToLayer(userIdentity);
     }
 
     public void AssignUserToLayer(UserIdentity userIdentity){
@@ -125,13 +133,16 @@ public class Map {
 
             BodyDef bodyDef = new BodyDef();
             bodyDef.type = BodyDef.BodyType.DynamicBody;
-            bodyDef.position.set(0, 0);
+            if (userIdentity.playerData.PlayerPosition != null)
+                bodyDef.position.set(userIdentity.playerData.PlayerPosition);
+            else
+                bodyDef.position.set(SpawnPoint);
             Body body = world.createBody(bodyDef);
             body.setFixedRotation(true);
             FixtureDef fd = new FixtureDef();
 
             PolygonShape groundBox = new PolygonShape();
-            groundBox.setAsBox(tileWidth/2* FixedValues.TileScale, tileHeight/2* FixedValues.TileScale);
+            groundBox.setAsBox(tileWidth / 2f * FixedValues.TileScale, tileHeight / 2f * FixedValues.TileScale);
             fd.shape = groundBox;
 
             body.createFixture(fd);

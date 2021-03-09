@@ -2,6 +2,7 @@ package Managers;
 
 import Data.UpdatePackageToServer;
 import Data.updatePackageToServerDummy;
+import Managers.Animation.Direction;
 import Managers.Input.KeyBind;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -16,6 +17,9 @@ public class InputManager implements ApplicationListener, InputProcessor {
     private int OldKey = -1;
     private ArrayList<Integer> pressedKeys = new ArrayList<>();
 
+    public static Direction direction = Direction.DOWN;
+    public static boolean IsMoving = false;
+
     @Override
     public void create() {
 
@@ -27,7 +31,8 @@ public class InputManager implements ApplicationListener, InputProcessor {
     }
 
     public void Update(float delta){
-        for (Integer integer:pressedKeys) {
+        boolean found = false;
+        for (Integer integer : pressedKeys) {
             //Once per click event
             if (integer != OldKey)
             {
@@ -36,10 +41,36 @@ public class InputManager implements ApplicationListener, InputProcessor {
 
             //Spam event
             updatePackageToServerDummy.inputsAsIntegers.add(integer);
+
             OldKey = integer;
+            switch (integer){
+                case Input.Keys.D:
+                    direction = Direction.RIGHT;
+                    IsMoving = true;
+                    found = true;
+                    break;
+                case Input.Keys.A:
+                    direction = Direction.LEFT;
+                    IsMoving = true;
+                    found = true;
+                    break;
+                case Input.Keys.W:
+                    direction = Direction.UP;
+                    IsMoving = true;
+                    found = true;
+                    break;
+                case Input.Keys.S:
+                    direction = Direction.DOWN;
+                    IsMoving = true;
+                    found = true;
+                    break;
+            }
+        }
+        if (updatePackageToServerDummy.inputsAsIntegers.size() == 0 && !found)
+        {
+            IsMoving = false;
         }
 
-        System.out.println(updatePackageToServerDummy.inputsAsIntegers.size());
     }
 
     @Override
