@@ -87,6 +87,7 @@ public class GameServer {
         ServerListener listener = new ServerListener();
         server.addListener(listener);
     }
+    
     class ServerListener implements Listener {
 
         @Override

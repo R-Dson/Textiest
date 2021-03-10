@@ -1,15 +1,10 @@
 package Components.Entities;
 
-import Data.UEntity;
+import com.badlogic.ashley.core.Entity;
 
-public class PlayerEntity extends UEntity {
+public class PlayerEntity extends Entity {
 
     public PlayerEntity() {
         super();
-    }
-
-    @Override
-    public void Update(float delta) {
-        super.Update(delta);
     }
 }

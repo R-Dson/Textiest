@@ -1,10 +1,10 @@
 package Managers.Map;
 
-import Components.Entities.MapEntity;
 import Components.Entities.PlayerEntity;
 import Components.PlayerComponents.B2dBodyComponent;
 import Data.FixedValues;
 import Managers.Network.UserIdentity;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -21,13 +21,12 @@ import com.vaniljstudio.server.ServerClass;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Map {
+public class Map implements Component {
 
     //public
     public MapType MapType;
     public String MapName;
     public World world;
-    public MapEntity mapEntity;
     public int tileWidth, tileHeight, mapWidthInTiles, mapHeightInTiles, mapWidthInPixels, mapHeightInPixels;
 
     //private
@@ -149,6 +148,7 @@ public class Map {
             body.setLinearDamping(50f);
 
             userIdentity.entity.add(new B2dBodyComponent(body));
+            ServerClass.Engine.addEntity(userIdentity.entity);
 
             groundBox.dispose();
         }

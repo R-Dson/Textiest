@@ -1,28 +1,28 @@
 package Managers;
 
-import Data.UEntity;
 import Managers.Network.UserIdentity;
+import com.badlogic.ashley.core.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EntityManager {
 
-    public List<UEntity> EntityList = new ArrayList<>();
+    public List<Entity> EntityList = new ArrayList<>();
 
-    public void Update(float delta){
+    /*public void Update(float delta){
         for (UEntity entity: EntityList) {
             entity.Update(delta);
         }
-    }
+    }*/
 
     public void RemoveUserIdentity(UserIdentity identity){
         identity.currentLayer.RemoveUserFromLayer(identity);
         EntityList.remove(identity);
     }
 
-    public UEntity getEntityByUniqueID(final String uniqueID){
-        for (UEntity e: EntityList) {
+    public Entity getEntityByUniqueID(final String uniqueID){
+        for (Entity e: EntityList) {
             if (e instanceof UserIdentity) {
                 if (((UserIdentity)e).UniqueID.equals(uniqueID))
                     return e;
@@ -33,7 +33,7 @@ public class EntityManager {
     }
 
     public UserIdentity getUserIdentityByConnectID(final int connectID){
-        for (UEntity e: EntityList) {
+        for (Entity e: EntityList) {
             if (e instanceof UserIdentity) {
                 if (((UserIdentity)e).connectionID == connectID)
                     return (UserIdentity)e;

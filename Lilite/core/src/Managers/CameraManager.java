@@ -34,7 +34,6 @@ public class CameraManager extends OrthographicCamera {
             targetPosition.scl(speed);
             cameraPosition.add(new Vector3(targetPosition.x, targetPosition.y, 0));
             _Camera.update();
-            System.out.println(targetPosition + " : " + cameraPosition);
         }
     }
 

@@ -4,15 +4,15 @@ import Components.Entities.PlayerEntity;
 import Components.PlayerComponents.B2dBodyComponent;
 import Data.FixedValues;
 import Data.PlayerData;
-import Data.UEntity;
 import Data.UpdatePackage;
 import Managers.Map.Map;
 import Managers.Map.MapLayer;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.vaniljstudio.server.ServerClass;
 
-public class UserIdentity extends UEntity {
+public class UserIdentity extends Entity {
     public String UniqueID;
     public int connectionID;
     public PlayerEntity entity;
@@ -36,7 +36,6 @@ public class UserIdentity extends UEntity {
         currentMap = null;
     }
 
-    @Override
     public void Update(float delta) {
         timer += delta;
         //MAKE THIS 1/20 later
@@ -59,7 +58,6 @@ public class UserIdentity extends UEntity {
 
         //TODO SEND INFORMATION TO USER
 
-        super.Update(delta);
     }
 
     private void UpdatePlayerPositionData(){

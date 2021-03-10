@@ -5,23 +5,45 @@ import Data.FixedValues;
 import Managers.EntityManager;
 import Managers.FileManager;
 import Managers.Network.UserIdentity;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.vaniljstudio.server.ServerClass;
 
 import java.util.ArrayList;
 
-public class MapManager {
+public class MapManager extends EntitySystem {
     public ArrayList<Map> MapList = new ArrayList<>();
+    ImmutableArray<Entity> entities;
 
     public void LoadMaps(){
         MapList = FileManager.LoadMapsFromFile();
         for (Map map :MapList) {
             map.LoadMap();
             MapEntity MapEntity = new MapEntity(map);
-            map.mapEntity = MapEntity;
+            //map.mapEntity = MapEntity;
             //TODO Only render collision tiles
-            ServerClass.EntityManager.EntityList.add(MapEntity);
+            //ServerClass.EntityManager.EntityList.add(MapEntity);
+            ServerClass.Engine.addEntity(MapEntity);
         }
+        entities = ServerClass.Engine.getEntitiesFor(Family.all(Map.class).get());
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+
+        for (Entity entity : entities) {
+            if (entity instanceof MapEntity)
+            {
+                MapEntity me = (MapEntity) entity;
+                Map map = me.getComponent(Map.class);
+                map.Update(deltaTime);
+            }
+        }
+
     }
 
     public Map GetMapByName(String name){
