@@ -5,8 +5,8 @@ public class StaticValues {
     public static final float updateFrequency = 1/60f;
 
     public static final String KeyBindData = "Data/KeyBindData.json";
-    public static final String TextureAtlasData = "Data/TextureAtlasData.json";
-    public static final String AbilityData = "Data/AbilityData.json";
+    //public static final String TextureAtlasData = "Data/TextureAtlasData.json";
+    //public static final String AbilityData = "Data/AbilityData.json";
 
     public static final String WallpaperPath = "Wallpaper/game_background.png";
 

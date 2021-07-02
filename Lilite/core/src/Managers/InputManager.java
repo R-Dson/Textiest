@@ -1,16 +1,12 @@
 package Managers;
 
-import Data.UpdatePackageToServer;
 import Data.updatePackageToServerDummy;
 import Managers.Animation.Direction;
-import Managers.Input.KeyBind;
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class InputManager implements ApplicationListener, InputProcessor {
 

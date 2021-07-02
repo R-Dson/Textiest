@@ -2,14 +2,16 @@ package Managers;
 
 import Data.Credential;
 import Data.FixedValues;
-import Managers.Ability.Ability;
-import Managers.Items.EquipmentItem;
+import DataShared.Ability.Ability;
+import DataShared.Files.FileManagerShared;
+import DataShared.Item.EquipmentItem;
 import Managers.Map.Map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileManager {
     //public static Gson gson = new Gson();
@@ -28,23 +30,7 @@ public class FileManager {
     }
 
     public static ArrayList<Map> LoadMapsFromFile(){
-        return getList(FixedValues.MapData, Map.class);
-    }
-
-    public static ArrayList<Ability> GetAbilities(String FilePath){
-        return getList(FilePath, Ability.class);
-    }
-
-    private static <T> ArrayList<T> getList(String FilePath, Class<T> convert){
-        Json j = new Json();
-        FileHandle file = Gdx.files.local(FilePath);
-        if (file == null)
-            return null;
-        String data = file.readString();
-
-        ArrayList<T> c = j.fromJson(ArrayList.class, convert, data);
-
-        return c;
+        return FileManagerShared.getList(FixedValues.MapData, Map.class);
     }
 
     private static String Loader(String path){
@@ -53,5 +39,4 @@ public class FileManager {
             return null;
         return file.readString();
     }
-
 }

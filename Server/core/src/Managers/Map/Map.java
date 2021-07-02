@@ -4,6 +4,7 @@ import Components.Entities.PlayerEntity;
 import Components.PlayerComponents.B2dBodyComponent;
 import Data.FixedValues;
 import Managers.Network.UserIdentity;
+import Managers.PlayerManager;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapObject;
@@ -132,8 +133,9 @@ public class Map implements Component {
 
             BodyDef bodyDef = new BodyDef();
             bodyDef.type = BodyDef.BodyType.DynamicBody;
-            if (userIdentity.playerData.PlayerPosition != null)
-                bodyDef.position.set(userIdentity.playerData.PlayerPosition);
+            Vector2 position = PlayerManager.GetPosition(userIdentity.playerData);
+            if (position != null)
+                bodyDef.position.set(position);
             else
                 bodyDef.position.set(SpawnPoint);
             Body body = world.createBody(bodyDef);

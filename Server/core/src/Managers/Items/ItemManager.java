@@ -1,6 +1,9 @@
 package Managers.Items;
 
 import Data.FixedValues;
+import DataShared.Item.EquipmentItem;
+import DataShared.Item.Item;
+import DataShared.Item.ItemEnums;
 import Managers.FileManager;
 
 import java.util.ArrayList;
@@ -59,7 +62,6 @@ public class ItemManager {
 
     public static int EquipmentTypeEnumToInt(ItemEnums.EquipmentType type){
         switch (type){
-
             case HELM:
                 return FixedValues.HELM;
             case CHEST:

@@ -1,7 +1,7 @@
 package Managers.Input;
 
-import Managers.Ability.Ability;
-import Managers.Ability.AbilityManager;
+import DataShared.Ability.Ability;
+import DataShared.Ability.AbilityManager;
 
 public class KeyBind {
     public Ability BoundAbility;

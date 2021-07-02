@@ -1,6 +1,6 @@
 package Managers.Scenes;
 
-import Managers.Networking.NetworkingMessages.SceneNameEnum;
+import DataShared.Network.NetworkMessages.SceneNameEnum;
 import com.esotericsoftware.kryonet.Client;
 import com.vaniljstudio.lilite.Lilite;
 
@@ -16,14 +16,15 @@ public class SceneChangeRunnable implements Runnable{
     @Override
     public void run() {
         switch (sceneNameEnum){
-            case CharacterCreationScene:
-                com.vaniljstudio.lilite.Lilite.CurrentScene = new CharacterCreationScene(_client);
-                break;
             case MainScene:
-                com.vaniljstudio.lilite.Lilite.CurrentScene = new MainScene(_client);
+                Lilite.CurrentScene = new MainScene(_client);
                 break;
             case LoginScene:
                 Lilite.CurrentScene = new LoginScene();
+                break;
+            case CharacterCreationScene:
+                Lilite.CurrentScene = new CharacterCreationScene(_client);
+                break;
         }
     }
 }

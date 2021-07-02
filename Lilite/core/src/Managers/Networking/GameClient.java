@@ -1,25 +1,18 @@
 package Managers.Networking;
 
-import Data.PlayerData;
-import Data.UpdatePackage;
-import Data.UpdatePackageToServer;
-import Managers.Items.EquipmentItem;
-import Managers.Networking.NetworkingMessages.*;
+import DataShared.Network.NetworkMessages.*;
+import DataShared.Network.UpdatePackage;
 import Managers.OtherPlayerManager;
 import Managers.PlayerManager;
-import Managers.Scenes.CharacterCreationScene;
 import Managers.Scenes.LoginScene;
-import Managers.Scenes.MainScene;
 import Managers.Scenes.SceneChangeRunnable;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GameClient {
     
@@ -42,22 +35,7 @@ public class GameClient {
 
     private void Register(){
         kryo = client.getKryo();
-        kryo.register(ConnectionEstablished.class);
-        kryo.register(LoginRequest.class);
-        kryo.register(LoginError.class);
-        kryo.register(ErrorEnum.class);
-        kryo.register(RegisterRequest.class);
-        kryo.register(PlayerData.class);
-        kryo.register(UpdatePackage.class);
-        kryo.register(ArrayList.class);
-        kryo.register(EquipmentItem[].class);
-        kryo.register(Vector2.class);
-        kryo.register(LoginResult.class);
-        kryo.register(LoginEnum.class);
-        kryo.register(UpdatePackageToServer.class);
-        kryo.register(SceneNameEnum.class);
-        kryo.register(CreationRequest.class);
-        kryo.register(ChangeScene.class);
+        DataShared.Network.NetworkManager.Register(kryo);
     }
 
     private void InitClient(){

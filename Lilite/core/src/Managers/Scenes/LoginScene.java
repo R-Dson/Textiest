@@ -1,9 +1,9 @@
 package Managers.Scenes;
 
 import Data.StaticValues;
+import DataShared.Network.NetworkMessages.LoginRequest;
+import DataShared.Network.NetworkMessages.RegisterRequest;
 import Managers.Networking.GameClient;
-import Managers.Networking.NetworkingMessages.LoginRequest;
-import Managers.Networking.NetworkingMessages.RegisterRequest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;

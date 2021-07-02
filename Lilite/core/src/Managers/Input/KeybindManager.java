@@ -1,7 +1,7 @@
 package Managers.Input;
 
 import Data.StaticValues;
-import Managers.Ability.AbilityManager;
+import DataShared.Ability.AbilityManager;
 import Managers.FileManager;
 
 import java.util.List;

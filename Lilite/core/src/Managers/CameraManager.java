@@ -23,12 +23,12 @@ public class CameraManager extends OrthographicCamera {
         _Camera.update();
     }
 
-    final float speed=0.25f,ispeed=1.0f-speed;
+    final float speed = 0.25f, ispeed = 1.0f - speed;
 
     public void render(SpriteBatch batch){
         if (_Camera != null){
             Vector3 cameraPosition = _Camera.position;
-            targetPosition = PlayerManager.playerData.PlayerPosition.cpy();
+            targetPosition = PlayerManager.GetPosition().cpy();
             //TODO: FIX CAMERA ASAP
             cameraPosition.scl(ispeed);
             targetPosition.scl(speed);

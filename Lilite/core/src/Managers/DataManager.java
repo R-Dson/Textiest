@@ -1,8 +1,6 @@
 package Managers;
 
-import Data.StaticValues;
-import Managers.Ability.AbilityManager;
-import Managers.Animation.AnimationTextures;
+import DataShared.Ability.AbilityManager;
 import Managers.Input.KeybindManager;
 
 public class DataManager {

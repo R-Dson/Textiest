@@ -1,6 +1,6 @@
 package Managers;
 
-import Data.PlayerData;
+import DataShared.Player.PlayerData;
 
 import java.util.ArrayList;
 

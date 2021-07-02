@@ -2,8 +2,7 @@ package com.vaniljstudio.server;
 
 import Components.Entities.MapEntity;
 import Data.Credential;
-import Managers.Ability.Ability;
-import Managers.Ability.AbilityManager;
+import DataShared.Ability.AbilityManager;
 import Managers.EntityManager;
 import Managers.FileManager;
 import Managers.Items.ItemManager;
@@ -19,7 +18,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ServerClass extends ApplicationAdapter {
@@ -28,7 +26,7 @@ public class ServerClass extends ApplicationAdapter {
 	public static GameServer GameServer;
 	public static SQLManager SQLManager;
 	public static ItemManager ItemManager;
-	public static AbilityManager AbilityManager;
+	public static DataShared.Ability.AbilityManager AbilityManager;
 	public static AssetManager AssetManager;
 	public static EntityManager EntityManager;
 	public static MapManager MapManager;

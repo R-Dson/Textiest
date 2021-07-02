@@ -3,11 +3,12 @@ package Managers.Network;
 import Components.Entities.PlayerEntity;
 import Components.PlayerComponents.B2dBodyComponent;
 import Data.FixedValues;
-import Data.PlayerData;
-import Data.UpdatePackage;
+import DataShared.Network.UpdatePackage;
+import DataShared.Player.PlayerData;
 import Managers.Map.Map;
 import Managers.Map.MapLayer;
 
+import Managers.PlayerManager;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.vaniljstudio.server.ServerClass;
@@ -62,14 +63,14 @@ public class UserIdentity extends Entity {
 
     private void UpdatePlayerPositionData(){
         Body body = entity.getComponent(B2dBodyComponent.class).body;
-        playerData.PlayerPosition = body.getPosition();
+        PlayerManager.SetPosition(playerData, body.getPosition());
     }
 
     private void FillOtherUsers(UpdatePackage UpdatePackage){
         if(currentLayer != null){
             for (UserIdentity userIdentity : currentLayer.users) {
                 //TODO CHANGE DISTANCE
-                if (userIdentity.playerData.PlayerPosition.len() < 2000 && connectionID != userIdentity.connectionID)
+                if (PlayerManager.GetPosition(playerData).len() < 2000 && connectionID != userIdentity.connectionID)
                 {
                     UpdatePackage.OtherPlayers.add(userIdentity.playerData);
                 }

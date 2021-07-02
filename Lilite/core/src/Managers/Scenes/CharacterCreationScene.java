@@ -1,10 +1,9 @@
 package Managers.Scenes;
 
-import Data.PlayerData;
 import Data.StaticValues;
+import DataShared.Network.NetworkMessages.CreationRequest;
 import Managers.Animation.Animation;
 import Managers.DataManager;
-import Managers.Networking.NetworkingMessages.CreationRequest;
 import Managers.PlayerManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

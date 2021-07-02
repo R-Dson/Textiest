@@ -1,9 +1,8 @@
 package Managers.Scenes;
 
-import Data.PlayerData;
 import Data.StaticValues;
-import Data.UpdatePackageToServer;
 import Data.updatePackageToServerDummy;
+import DataShared.Network.UpdatePackageToServer;
 import Managers.Animation.Animation;
 import Managers.CameraManager;
 import Managers.DataManager;
@@ -11,11 +10,9 @@ import Managers.InputManager;
 import Managers.Map.MapManager;
 import Managers.PlayerManager;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.fma.SlotAssignmentStrategy;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.kryonet.Client;
 
@@ -46,7 +43,7 @@ public class MainScene extends Scene {
 
                 TextureRegion tr = _Animation.GetCurrentTextureRegion();
 
-                Vector3 pos = new Vector3(PlayerManager.playerData.PlayerPosition.x, PlayerManager.playerData.PlayerPosition.y, 0);
+                Vector3 pos = new Vector3(PlayerManager.playerData.x, PlayerManager.playerData.y, 0);
                 _CameraManager.get_Camera().project(pos);
 
                 //TODO: CHANGE WHEN RESIZING SCREEN

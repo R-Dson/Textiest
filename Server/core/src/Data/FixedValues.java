@@ -14,8 +14,8 @@ public class FixedValues {
     public static final float UpdateFrequency30 = 1/30f;
     public static final float TileScale = 1/64f;
 
-    public static final String TextureAtlasData = "Data/TextureAtlasData.json";
-    public static final String AbilityData = "Data/AbilityData.json";
+    //public static final String TextureAtlasData = "Data/TextureAtlasData.json";
+    //public static final String AbilityData = "Data/AbilityData.json";
     public static final String ItemData = "Data/ItemData.json";
     public static final String MapData = "Data/MapData.json";
     public static final String DefaultMap = "map";

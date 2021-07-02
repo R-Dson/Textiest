@@ -1,16 +1,10 @@
 package Managers.Network;
 
-import Data.PlayerData;
-import Data.UpdatePackage;
-import Data.UpdatePackageToServer;
-import Managers.BcryptManager;
-import Managers.EntityManager;
-import Managers.InputManager;
-import Managers.Items.EquipmentItem;
+import DataShared.Network.NetworkMessages.*;
+import DataShared.Network.UpdatePackageToServer;
+import DataShared.Player.PlayerData;
+import Managers.*;
 import Managers.Map.MapManager;
-import Managers.Network.NetworkingMessages.*;
-import Managers.SQLManager;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
@@ -61,26 +55,7 @@ public class GameServer {
     private void Register(){
         //get kryo
         kryo = server.getKryo();
-
-        //add register
-        kryo.register(ConnectionEstablished.class);
-        kryo.register(LoginRequest.class);
-        kryo.register(LoginError.class);
-        kryo.register(ErrorEnum.class);
-        kryo.register(RegisterRequest.class);
-        kryo.register(PlayerData.class);
-        kryo.register(UpdatePackage.class);
-        kryo.register(ArrayList.class);
-        kryo.register(EquipmentItem[].class);
-        kryo.register(Vector2.class);
-        kryo.register(LoginResult.class);
-        kryo.register(LoginEnum.class);
-        kryo.register(UpdatePackageToServer.class);
-        kryo.register(SceneNameEnum.class);
-        kryo.register(CreationRequest.class);
-        kryo.register(ChangeScene.class);
-        kryo.register(AssignRequest.class);
-
+        DataShared.Network.NetworkManager.Register(kryo);
     }
 
     private void AddListeners(){
@@ -229,7 +204,7 @@ public class GameServer {
             String encrypt = BcryptManager.Encrypt(request.Password);
 
             PlayerData playerData = new PlayerData();
-            playerData.GenerateData();
+            PlayerManager.GenerateData(playerData);
 
             String jsonString = json.toJson(playerData);
             SQLManager.addData(request.Username, encrypt, jsonString);
