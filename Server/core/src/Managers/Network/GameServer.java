@@ -73,11 +73,12 @@ public class GameServer {
         @Override
         public void disconnected(Connection connection) {
             UserIdentity identity = EntityManager.getUserIdentityByConnectID(connection.getID());
-
-            String jsonString = json.toJson(identity.playerData);
-            SQLManager.UpdateData(identity.UserName, jsonString);
-            identity.RemoveUserIdentity();
-            EntityManager.RemoveUserIdentity(identity);
+            if (identity != null){
+                String jsonString = json.toJson(identity.playerData);
+                SQLManager.UpdateData(identity.UserName, jsonString);
+                identity.RemoveUserIdentity();
+                EntityManager.RemoveUserIdentity(identity);
+            }
         }
 
         @Override

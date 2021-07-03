@@ -4,13 +4,16 @@ import DataShared.Network.NetworkMessages.*;
 import DataShared.Network.UpdatePackage;
 import Managers.OtherPlayerManager;
 import Managers.PlayerManager;
+import Managers.Scenes.ConnectionScene;
 import Managers.Scenes.LoginScene;
 import Managers.Scenes.SceneChangeRunnable;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.vaniljstudio.lilite.Lilite;
 
 import java.io.IOException;
 
@@ -60,21 +63,41 @@ public class GameClient {
         }
     }
 
-    public boolean AttempConnection(){
-        boolean connected = Connect();
-        int attempts = 0;
+    public static int ConnectionAttempts = 0;
 
-        while (!connected && attempts < 1){
-            AttemptTimer += Gdx.graphics.getDeltaTime();
-            if(AttemptTimer > 0){
-                attempts++;
-                Gdx.app.log("NETWORK_ERROR", "Attempting to connect! Total attempts: " + attempts);
-                connected = Connect();
-                AttemptTimer -= 3;
+    public boolean AttemptConnection(){
+
+        Timer.Task task = new Timer.Task(){
+            boolean connected = false;
+            @Override
+            public void run() {
+                if(Lilite.CurrentScene instanceof ConnectionScene)
+                    ((ConnectionScene)Lilite.CurrentScene).userLabel.setText("Connecting...");
+
+                if (!connected){
+                    ConnectionAttempts++;
+                    Gdx.app.log("NETWORK_ERROR", "Attempting to connect! Total attempts: " + ConnectionAttempts);
+                    connected = Connect();
+                    if (!connected && ConnectionAttempts > 3){
+                        if(Lilite.CurrentScene instanceof ConnectionScene)
+                            ((ConnectionScene)Lilite.CurrentScene).userLabel.setText("Failed Connecting.");
+
+                        Gdx.app.log("STATUS", "Connection status: " + client.isConnected() + " After " + ConnectionAttempts + "Attempts.");
+                        this.cancel();
+                    }
+                }
+                else{
+                    if(Lilite.CurrentScene instanceof ConnectionScene)
+                        ((ConnectionScene)Lilite.CurrentScene).userLabel.setText("Connected!");
+                    Gdx.app.log("STATUS", "Connection status: " + client.isConnected() + " After " + ConnectionAttempts + "Attempts.");
+                    this.cancel();
+                }
             }
+        };
 
-        }
-        return connected;
+        Gdx.app.log("STATUS", "Attempting to connect to server.");
+        Timer.schedule(task, 5, 1, 1);
+        return client.isConnected();
     }
 
     private boolean Connect(){
@@ -87,7 +110,7 @@ public class GameClient {
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }

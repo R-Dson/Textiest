@@ -13,17 +13,14 @@ public class ConnectionScene extends Scene{
         userLabel = new VisLabel("Connecting...");
         table.add(userLabel);
         table.setDebug(true);
-        boolean b = CheckConnection();
-        if (b)
-            userLabel.setText("Connected.");
-        else
-            userLabel.setText("Failed Connection");
+
+        CheckConnection();
     }
 
     private boolean CheckConnection(){
         if (Lilite.GameClient.getClient() == null) return false;
         if (Lilite.GameClient.getClient().isConnected()) return true;
-        return Lilite.GameClient.AttempConnection();
+        return Lilite.GameClient.AttemptConnection();
     }
 
     @Override
@@ -34,9 +31,15 @@ public class ConnectionScene extends Scene{
         stage.draw();
     }
 
+    float timer = 0;
     @Override
     public void update(float delta) {
+        timer += delta;
+        if (timer > 12)
+        {
 
+            timer -= 12;
+        }
     }
 
     @Override

@@ -34,7 +34,9 @@ public class Lilite extends ApplicationAdapter {
 		//Starts the client
 		GameClient.StartClient();
 
-		CurrentScene = new ConnectionScene();
+		ConnectionScene connectionScene = new ConnectionScene();
+		connectionScene.create();
+		CurrentScene = connectionScene;
 	}
 
 	@Override

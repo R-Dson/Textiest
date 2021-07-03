@@ -9,11 +9,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.vaniljstudio.lilite.Lilite;
@@ -57,7 +55,7 @@ public class LoginScene extends Scene {
         register.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (CheckConnection()){
+                if (client.getClient().isConnected()){
                     RegisterRequest req = new RegisterRequest();
                     req.Password = "test";
                     req.Username = "t69";
@@ -69,6 +67,9 @@ public class LoginScene extends Scene {
                     request.Username = "tre4";
                     request.UniqueID = com.vaniljstudio.lilite.Lilite.uniqueID;*/
                     //client.getClient().sendTCP(request);
+                }
+                else{
+                    CheckConnection();
                 }
             }
         });
@@ -92,7 +93,7 @@ public class LoginScene extends Scene {
     private boolean CheckConnection(){
         if (client.getClient() == null) return false;
         if (client.getClient().isConnected()) return true;
-        return client.AttempConnection();
+        return client.AttemptConnection();
     }
 
     @Override
