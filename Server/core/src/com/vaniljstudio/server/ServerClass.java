@@ -7,6 +7,7 @@ import Managers.EntityManager;
 import Managers.FileManager;
 import Managers.Items.ItemManager;
 import Managers.Map.Map;
+import Managers.Map.MapLayer;
 import Managers.Map.MapManager;
 import Managers.Network.GameServer;
 import Managers.SQLManager;
@@ -51,7 +52,8 @@ public class ServerClass extends ApplicationAdapter {
 		Engine = new Engine();
 
 		SQLManager = new SQLManager(credential);
-		
+
+		//setups
 		ItemManager.LoadItems();
 		AbilityManager.LoadAbilities();
 		MapManager.LoadMaps();
@@ -67,38 +69,29 @@ public class ServerClass extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		float delta = Gdx.graphics.getDeltaTime();
 		Gdx.gl.glClearColor(0, 0, 0.5f, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		GameServer.Update(Gdx.graphics.getDeltaTime());
+		GameServer.Update(delta);
 
-		Engine.update(Gdx.graphics.getDeltaTime());
+		Engine.update(delta);
 
-		EntityUpdateTimer += Gdx.graphics.getDeltaTime();
+		/*EntityUpdateTimer += delta;
 		if (EntityUpdateTimer > 1/10f){
 			//EntityManager.Update(EntityUpdateTimer);
 			EntityUpdateTimer -= 1/10f;
-		}
+		}*/
 
-		batch.begin();
-		//Map map = MapManager.GetMapByName("map");
-		ImmutableArray<Entity> entities =  Engine.getEntitiesFor(Family.all(Map.class).get());
-
-		for ( Entity entity: entities) {
-			if (entity instanceof MapEntity){
-				MapEntity mapEntity = (MapEntity) entity;
-				Map map = mapEntity.getComponent(Map.class);
-				if (map.MapName.equals("map") && mapEntity.debugRenderer != null && map.world != null && mapEntity.camera != null){
-					mapEntity.renderer.setView(mapEntity.camera);
-					mapEntity.renderer.render(new int[]{0,1,2,3,4});
-					mapEntity.debugRenderer.render(map.world, mapEntity.camera.combined);
-				}
-				batch.end();
-				break;
+		for (MapEntity mapEntity : MapManager.mapEntities) {
+			Map map = mapEntity.getComponent(Map.class);
+			for (MapLayer mapLayer : map.getMapLayers()) {
+				mapLayer.render(delta, mapEntity);
 			}
 		}
+		batch.begin();
 
-
+		batch.end();
 	}
 	
 	@Override

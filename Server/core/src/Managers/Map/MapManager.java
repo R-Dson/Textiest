@@ -16,34 +16,30 @@ import java.util.ArrayList;
 
 public class MapManager extends EntitySystem {
     public ArrayList<Map> MapList = new ArrayList<>();
-    ImmutableArray<Entity> entities;
+    public ArrayList<MapEntity> mapEntities = new ArrayList<>();
 
     public void LoadMaps(){
         MapList = FileManager.LoadMapsFromFile();
         for (Map map :MapList) {
             map.LoadMap();
             MapEntity MapEntity = new MapEntity(map);
-            //map.mapEntity = MapEntity;
-            //TODO Only render collision tiles
-            //ServerClass.EntityManager.EntityList.add(MapEntity);
+            mapEntities.add(MapEntity);
+            //TODO: Only render collision tiles
             ServerClass.Engine.addEntity(MapEntity);
         }
-        entities = ServerClass.Engine.getEntitiesFor(Family.all(Map.class).get());
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        for (Entity entity : entities) {
-            if (entity instanceof MapEntity)
+        for (MapEntity entity : mapEntities) {
+            if (entity != null)
             {
-                MapEntity me = (MapEntity) entity;
-                Map map = me.getComponent(Map.class);
+                Map map = entity.getComponent(Map.class);
                 map.Update(deltaTime);
             }
         }
-
     }
 
     public Map GetMapByName(String name){
@@ -52,12 +48,9 @@ public class MapManager extends EntitySystem {
 
     public void AssignLogin(UserIdentity userIdentity){
         String map;
-        if (userIdentity.playerData.LastMultiLocation == null)
-            map = FixedValues.DefaultMap;
-        else
-            map = userIdentity.playerData.LastMultiLocation;
-        Map foundMap;
-        foundMap = GetMapByName(map);
+        if (userIdentity.playerData.LastMultiLocation == null) map = FixedValues.DefaultMap;
+        else map = userIdentity.playerData.LastMultiLocation;
+        Map foundMap = GetMapByName(map);
         foundMap.AssignUserToLayer(userIdentity);
     }
 
@@ -68,22 +61,7 @@ public class MapManager extends EntitySystem {
     public UserIdentity GetUserByConnectionID(int connectionID){
         for (Map map: MapList) {
             for (MapLayer layer: map.getMapLayers()) {
-                for (UserIdentity userIdentity : layer.users) {
-                    if (connectionID == userIdentity.connectionID)
-                        return userIdentity;
-                }
-            }
-        }
-        return null;
-    }
-
-    public UserIdentity GetUserByUniqueID(String uniqueID){
-        for (Map map: MapList) {
-            for (MapLayer layer: map.getMapLayers()) {
-                for (UserIdentity userIdentity : layer.users) {
-                    if (uniqueID.equals(userIdentity.UniqueID))
-                        return userIdentity;
-                }
+                return layer.users.get(connectionID);
             }
         }
         return null;
@@ -93,5 +71,4 @@ public class MapManager extends EntitySystem {
         UserIdentity userIdentity = GetUserByConnectionID(connectionID);
         userIdentity.RemoveUserIdentity();
     }
-
 }

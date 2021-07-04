@@ -4,11 +4,13 @@ import Managers.Network.UserIdentity;
 import com.badlogic.ashley.core.Entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EntityManager {
 
-    public List<Entity> EntityList = new ArrayList<>();
+    //ConnectionID and UserIdentity
+    public HashMap<Integer, UserIdentity> EntityList = new HashMap<>();
 
     /*public void Update(float delta){
         for (UEntity entity: EntityList) {
@@ -17,14 +19,16 @@ public class EntityManager {
     }*/
 
     public void RemoveUserIdentity(UserIdentity identity){
-        identity.currentLayer.RemoveUserFromLayer(identity);
+        //identity.currentLayer.RemoveUserFromLayer(identity);
+        identity.RemoveUserIdentity();
         EntityList.remove(identity);
     }
 
     public Entity getEntityByUniqueID(final String uniqueID){
-        for (Entity e: EntityList) {
-            if (e instanceof UserIdentity) {
-                if (((UserIdentity)e).UniqueID.equals(uniqueID))
+
+        for (UserIdentity e: EntityList.values()) {
+            if (e != null) {
+                if (e.UniqueID.equals(uniqueID))
                     return e;
             }
 
@@ -33,13 +37,14 @@ public class EntityManager {
     }
 
     public UserIdentity getUserIdentityByConnectID(final int connectID){
-        for (Entity e: EntityList) {
+        return EntityList.get(connectID);
+        /*for (Entity e: EntityList) {
             if (e instanceof UserIdentity) {
                 if (((UserIdentity)e).connectionID == connectID)
                     return (UserIdentity)e;
             }
 
         }
-        return null;
+        return null;*/
     }
 }

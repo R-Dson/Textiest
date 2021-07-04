@@ -97,13 +97,14 @@ public class CharacterCreationScene extends Scene{
     }
 
     private void ChangeCharacter(){
-        if (CharacterSelected >= characterNamesFemale.length)
-            CharacterSelected = 0;
+        //if (CharacterSelected >= characterNamesFemale.length)
+            //CharacterSelected = 0;
         if (gender)
             animation = new Animation(DataManager._textureManager.GenerateAnimationTextures(characterNamesFemale[CharacterSelected]));
         else
             animation = new Animation(DataManager._textureManager.GenerateAnimationTextures(characterNamesMale[CharacterSelected]));
         CharacterSelected++;
+        CharacterSelected = CharacterSelected % (characterNamesFemale.length);
     }
 
     @Override

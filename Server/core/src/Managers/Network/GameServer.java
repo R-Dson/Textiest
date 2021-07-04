@@ -6,6 +6,7 @@ import DataShared.Player.PlayerData;
 import Managers.*;
 import Managers.Map.MapManager;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -76,7 +77,6 @@ public class GameServer {
             if (identity != null){
                 String jsonString = json.toJson(identity.playerData);
                 SQLManager.UpdateData(identity.UserName, jsonString);
-                identity.RemoveUserIdentity();
                 EntityManager.RemoveUserIdentity(identity);
             }
         }
@@ -85,20 +85,18 @@ public class GameServer {
         public void received(Connection connection, Object obj) {
             if (obj instanceof ConnectionEstablished)
             {
-                connectionEstablished(connection, obj);
+                connectionEstablished(connection, (ConnectionEstablished)obj);
             }
             else if(obj instanceof LoginRequest){
-                loginRequest(connection, obj);
+                loginRequest(connection, (LoginRequest)obj);
             }
             else if (obj instanceof RegisterRequest) {
-                registerRequest(connection, obj);
+                registerRequest(connection, (RegisterRequest)obj);
             }
             else if (obj instanceof UpdatePackageToServer){
-                UpdatePackageToServer upts = (UpdatePackageToServer)obj;
-                if (!upts.inputsAsIntegers.isEmpty()){
-                    UserIdentity ui = EntityManager.getUserIdentityByConnectID(connection.getID());
-                    InputManager.CalculateMovement(ui, upts.inputsAsIntegers);
-                }
+                UpdatePackageToServer updatePackageToServer = (UpdatePackageToServer)obj;
+                UserIdentity ui = EntityManager.getUserIdentityByConnectID(connection.getID());
+                RecievedManager.AddMovementRequest(ui, updatePackageToServer.inputsAsIntegers);
             }
             else if (obj instanceof CreationRequest){
                 CreationRequest cr = (CreationRequest)obj;
@@ -124,8 +122,8 @@ public class GameServer {
 
         }
 
-        private void loginRequest(Connection connection, Object obj){
-            LoginRequest request = (LoginRequest)obj;
+        private void loginRequest(Connection connection, LoginRequest request){
+
             String encPsw = SQLManager.requestUsernameExist(request.Username);
 
             //null if username doesn't exist
@@ -185,7 +183,7 @@ public class GameServer {
 
         }
 
-        private void connectionEstablished(Connection connection, Object obj){
+        private void connectionEstablished(Connection connection, ConnectionEstablished obj){
             String uniqueID = UUID.randomUUID().toString();
             System.out.println("New connection. ID: " + connection.getID() + ", Unique ID: " + uniqueID);
 
@@ -198,10 +196,9 @@ public class GameServer {
             connection.sendTCP(changeScene);
         }
 
-        private Json json = new Json();
-        private void registerRequest(Connection connection, Object obj){
+        private final Json json = new Json();
+        private void registerRequest(Connection connection, RegisterRequest request){
             //TODO Encrypt user side later
-            RegisterRequest request = (RegisterRequest) obj;
             String encrypt = BcryptManager.Encrypt(request.Password);
 
             PlayerData playerData = new PlayerData();
@@ -209,6 +206,27 @@ public class GameServer {
 
             String jsonString = json.toJson(playerData);
             SQLManager.addData(request.Username, encrypt, jsonString);
+
+            CreationRequest creationRequest = new CreationRequest();
+            creationRequest.playerData = playerData;
+            creationRequest.UserName = playerData.UserName;
+            connection.sendTCP(creationRequest);
+
+            /*Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    ChangeScene changeScene = new ChangeScene();
+                    changeScene.sceneName = SceneNameEnum.CharacterCreationScene;
+                    connection.sendTCP(changeScene);
+                }
+            }, 1.5f);*/
+
+            /*try{
+                Thread.sleep(1500);
+            }
+            catch (InterruptedException ignored)
+            { }*/
+
         }
 
     }
@@ -218,23 +236,40 @@ public class GameServer {
         UTimer += delta;
         if (UTimer >= 0.25)
         {
-            if (ToBeAssigned.size() > 0)
-            {
-                Iterator iterator = ToBeAssigned.iterator();
-                //Json json = new Json();
+            // Updates assignment to map/layer
+            UpdateAssign(delta);
 
-                while (iterator.hasNext())
-                {
-                    UserIdentity next = (UserIdentity)iterator.next();
-                    //String data = _SQLManager.requestData(next.UserName);
-                    //next.playerData = json.fromJson(PlayerData.class, data);
-                    EntityManager.EntityList.add(next);
-                    MapManager.AssignLogin(next);
-                    iterator.remove();
-                }
-            }
+            // Updates from received data
+            UpdateRecieved(delta);
+
 
             UTimer -= 0.25;
+        }
+    }
+
+    Json json = new Json();
+    private void UpdateAssign(float delta){
+        if (ToBeAssigned.size() > 0)
+        {
+            Iterator<UserIdentity> iterator = ToBeAssigned.iterator();
+
+            while (iterator.hasNext())
+            {
+                //TODO
+                UserIdentity next = (UserIdentity)iterator.next();
+                String data = SQLManager.requestData(next.UserName);
+                next.playerData = json.fromJson(PlayerData.class, data);
+                EntityManager.EntityList.put(next.connectionID, next);
+                MapManager.AssignLogin(next);
+                iterator.remove();
+            }
+        }
+    }
+
+    private void UpdateRecieved(float delta){
+        while (RecievedManager.HasMovementRequest()){
+            RecievedManager.MovementRequest request = RecievedManager.GetMovementRequest();
+            InputManager.CalculateMovement(request.userIdentity, request.movementList);
         }
     }
 

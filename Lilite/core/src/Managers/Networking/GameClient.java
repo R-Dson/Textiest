@@ -161,6 +161,15 @@ public class GameClient {
                 Runnable runnable = new SceneChangeRunnable(cs.sceneName, client);
                 Gdx.app.postRunnable(runnable);
             }
+            else if (obj instanceof CreationRequest){
+                CreationRequest cr = (CreationRequest)obj;
+                PlayerManager.playerData = cr.playerData;
+
+                LoginRequest request = new LoginRequest();
+                request.Username = "testasssa";
+                request.Password = "testasssa";
+                client.sendTCP(request);
+            }
 
         }
 

@@ -30,11 +30,7 @@ public class UserIdentity extends Entity {
     }
 
     public void RemoveUserIdentity(){
-        Body body = entity.getComponent(B2dBodyComponent.class).body;
-        if (body != null)
-            currentMap.world.destroyBody(body);
         currentLayer.RemoveUserFromLayer(this);
-        currentMap = null;
     }
 
     public void Update(float delta) {
@@ -68,7 +64,7 @@ public class UserIdentity extends Entity {
 
     private void FillOtherUsers(UpdatePackage UpdatePackage){
         if(currentLayer != null){
-            for (UserIdentity userIdentity : currentLayer.users) {
+            for (UserIdentity userIdentity : currentLayer.users.values()) {
                 //TODO CHANGE DISTANCE
                 if (PlayerManager.GetPosition(playerData).len() < 2000 && connectionID != userIdentity.connectionID)
                 {

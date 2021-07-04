@@ -1,6 +1,7 @@
 package Managers.Scenes;
 
 import Data.StaticValues;
+import DataShared.Network.NetworkMessages.CreationRequest;
 import DataShared.Network.NetworkMessages.LoginRequest;
 import DataShared.Network.NetworkMessages.RegisterRequest;
 import Managers.Networking.GameClient;
@@ -57,8 +58,8 @@ public class LoginScene extends Scene {
             public void changed(ChangeEvent event, Actor actor) {
                 if (client.getClient().isConnected()){
                     RegisterRequest req = new RegisterRequest();
-                    req.Password = "test";
-                    req.Username = "t69";
+                    req.Username = "testasssa";
+                    req.Password = "testasssa";
                     client.getClient().sendTCP(req);
                     //TODO Change later to username text
 
