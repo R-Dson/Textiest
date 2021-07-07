@@ -1,6 +1,7 @@
 package DataShared.Files;
 
 import DataShared.Ability.Ability;
+import DataShared.Ability.Action;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
@@ -10,6 +11,10 @@ import java.util.ArrayList;
 public class FileManagerShared {
     public static ArrayList GetAbilities(String FilePath){
         return getList(FilePath, Ability.class);
+    }
+
+    public static ArrayList GetActions(String FilePath){
+        return getList(FilePath, Action.class);
     }
 
     public static <T> ArrayList getList(String FilePath, Class<T> convert){

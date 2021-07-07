@@ -13,7 +13,10 @@ public class ActionManager {
 
     public void LoadActions(){
         List<Ability> Abilities = FileManagerShared.GetAbilities(SharedStaticValues.AbilityData);
+        List<Action> actions = FileManagerShared.GetActions(SharedStaticValues.ActionData);
+        actions.forEach(a -> Actions.put(a.ID, a));
         Abilities.forEach(a -> Actions.put(a.ID, a));
+
     }
 
     public Action GetActionByID(int ID){

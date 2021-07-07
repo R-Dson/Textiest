@@ -2,7 +2,7 @@ package com.vaniljstudio.server;
 
 import Components.Entities.MapEntity;
 import Data.Credential;
-import DataShared.Ability.AbilityManager;
+import DataShared.Ability.ActionManager;
 import Managers.EntityManager;
 import Managers.FileManager;
 import Managers.Items.ItemManager;
@@ -27,7 +27,7 @@ public class ServerClass extends ApplicationAdapter {
 	public static GameServer GameServer;
 	public static SQLManager SQLManager;
 	public static ItemManager ItemManager;
-	public static DataShared.Ability.AbilityManager AbilityManager;
+	public static ActionManager ActionManager;
 	public static AssetManager AssetManager;
 	public static EntityManager EntityManager;
 	public static MapManager MapManager;
@@ -45,7 +45,7 @@ public class ServerClass extends ApplicationAdapter {
 
 		//Initiating managers
 		ItemManager = new ItemManager();
-		AbilityManager = new AbilityManager();
+		ActionManager = new ActionManager();
 		AssetManager = new AssetManager();
 		EntityManager = new EntityManager();
 		MapManager = new MapManager();
@@ -55,7 +55,7 @@ public class ServerClass extends ApplicationAdapter {
 
 		//setups
 		ItemManager.LoadItems();
-		AbilityManager.LoadAbilities();
+		ActionManager.LoadActions();
 		MapManager.LoadMaps();
 		Engine.addSystem(MapManager);
 

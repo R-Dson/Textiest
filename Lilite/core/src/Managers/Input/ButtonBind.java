@@ -4,21 +4,33 @@ import DataShared.Ability.Action;
 
 public class ButtonBind {
 
-    //private
+    // private
     private KeyBind keyBind;
     private Action action;
+
+    // public
+    public int BoundKey;
+    public int BoundActionID;
 
     public ButtonBind(KeyBind keyBind, Action action){
         this.keyBind = keyBind;
         this.action = action;
     }
 
-    public Action getAction(){
-        return action;
+    public ButtonBind(){
+        keyBind = new KeyBind();
     }
 
-    public int getKeyBindActionID() {
-        return keyBind.BoundActionID;
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public void setKeyBind(KeyBind keyBind) {
+        this.keyBind = keyBind;
+    }
+
+    public Action getAction(){
+        return action;
     }
 
     public int getBoundKey() {
