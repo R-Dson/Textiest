@@ -2,9 +2,11 @@ package Managers;
 
 import Data.updatePackageToServerDummy;
 import Managers.Animation.Direction;
+import Managers.Input.KeyBindManager;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.vaniljstudio.lilite.Lilite;
 
 import java.util.ArrayList;
 
@@ -15,6 +17,8 @@ public class InputManager implements ApplicationListener, InputProcessor {
 
     public static Direction direction = Direction.DOWN;
     public static boolean IsMoving = false;
+
+    private KeyBindManager keyBindManager;
 
     @Override
     public void create() {
@@ -28,6 +32,7 @@ public class InputManager implements ApplicationListener, InputProcessor {
 
     public void Update(float delta){
         boolean found = false;
+        Lilite.DataManager.Update(delta, pressedKeys);
         for (Integer integer : pressedKeys) {
             //Once per click event
             if (integer != OldKey)

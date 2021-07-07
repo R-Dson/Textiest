@@ -1,27 +1,32 @@
 package Managers;
 
-import DataShared.Ability.AbilityManager;
-import Managers.Input.KeybindManager;
+import DataShared.Ability.ActionManager;
+import Managers.Input.KeyBindManager;
+
+import java.util.ArrayList;
 
 public class DataManager {
-    private AbilityManager _abilityManager;
-    private KeybindManager _keybindManager;
+    private ActionManager _actionManager;
+    private KeyBindManager _keyBindManager;
     public static TextureManager _textureManager;
 
     public DataManager(){
-        _abilityManager = new AbilityManager();
-        _keybindManager = new KeybindManager();
+        _actionManager = new ActionManager();
+        _keyBindManager = new KeyBindManager();
         _textureManager = new TextureManager();
 
-        //Abilities
-        _abilityManager.LoadAbilities();
+        //Abilities, load these before keybinds
+        _actionManager.LoadActions();
 
         //Keybinds
-        _keybindManager.SetKeyBinds();
-        _keybindManager.AssignAbility(_abilityManager);
+        _keyBindManager.SetKeyBinds(_actionManager);
 
         //Textures
         _textureManager.LoadTextures();
+    }
+
+    public void Update(float delta, ArrayList<Integer> data){
+        _keyBindManager.Update(delta, data);
     }
 
 }

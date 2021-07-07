@@ -1,19 +1,15 @@
 package Managers.Input;
 
-import DataShared.Ability.Ability;
-import DataShared.Ability.AbilityManager;
-
 public class KeyBind {
-    public Ability BoundAbility;
     public int BoundKey;
-    public int BoundAbilityID;
+    public int BoundActionID;
 
-    /*public KeyBind(int BindedKey, int BindedAbilityID){
-        this.BoundKey = BindedKey;
-        this.BoundAbilityID = BindedAbilityID;
-    }*/
+    public KeyBind(int BoundKey, int BoundActionID){
+        this.BoundKey = BoundKey;
+        this.BoundActionID = BoundActionID;
+    }
 
-    private void SetAbility(AbilityManager abilityManager) {
-        abilityManager.GetAbilityByID(BoundAbilityID);
+    public KeyBind(){
+
     }
 }

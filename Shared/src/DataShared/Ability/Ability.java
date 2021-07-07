@@ -1,18 +1,25 @@
 package DataShared.Ability;
 import DataShared.Player.Class;
 
-public class Ability {
-    public String AbilityName;
-    public int ID;
-    public int BaseDamage;
+public class Ability extends Action {
+    // Requirement properties
     public int LevelRequirement;
-    public int ChannelTime;
-    public int TravelTime;
+
+    // Effect properties
     public int TravelSpeed;
     public int MaxDistance;
+
+    // Damage properties
     public int DamageDuration;
-    public int TotalDuration;
+    public int BaseDamage;
+
     public Class ClassAbility;
     public AbilityType AbilityType;
+
+    @Override
+    public void ActionEvent() {
+        // Do something when clicked
+
+    }
 }
 
