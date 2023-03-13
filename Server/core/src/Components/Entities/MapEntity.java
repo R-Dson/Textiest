@@ -20,7 +20,7 @@ public class MapEntity extends Entity {
 
         camera.position.set(camera.viewportWidth / 2f, 5*camera.viewportHeight / 2f, 0);
         camera.zoom += 3;
-        renderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1/64f);
+        //renderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1/64f);
 
         debugRenderer = new Box2DDebugRenderer();
         add(map);

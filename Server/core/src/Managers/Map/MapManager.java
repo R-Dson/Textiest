@@ -2,14 +2,9 @@ package Managers.Map;
 
 import Components.Entities.MapEntity;
 import Data.FixedValues;
-import Managers.EntityManager;
 import Managers.FileManager;
 import Managers.Network.UserIdentity;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.assets.AssetManager;
 import com.vaniljstudio.server.ServerClass;
 
 import java.util.ArrayList;
@@ -20,13 +15,21 @@ public class MapManager extends EntitySystem {
 
     public void LoadMaps(){
         MapList = FileManager.LoadMapsFromFile();
-        for (Map map :MapList) {
-            map.LoadMap();
+        for (Map map : MapList) {
             MapEntity MapEntity = new MapEntity(map);
+            map.getConnectedMapsID().forEach(id -> {
+                getMapByID(id).addConnectMap(map);
+                map.addConnectMap(getMapByID(id));
+            });
             mapEntities.add(MapEntity);
-            //TODO: Only render collision tiles
             ServerClass.Engine.addEntity(MapEntity);
         }
+
+    }
+
+    public Map getMapByID(int ID)
+    {
+        return MapList.stream().filter(map -> map.ID == ID).findFirst().get();
     }
 
     @Override
@@ -36,8 +39,8 @@ public class MapManager extends EntitySystem {
         for (MapEntity entity : mapEntities) {
             if (entity != null)
             {
-                Map map = entity.getComponent(Map.class);
-                map.Update(deltaTime);
+                entity.getComponent(Map.class).Update(deltaTime);
+                //map.Update(deltaTime);
             }
         }
     }
@@ -48,8 +51,10 @@ public class MapManager extends EntitySystem {
 
     public void AssignLogin(UserIdentity userIdentity){
         String map;
-        if (userIdentity.playerData.LastMultiLocation == null) map = FixedValues.DefaultMap;
-        else map = userIdentity.playerData.LastMultiLocation;
+        if (userIdentity.playerData.LastMultiLocation == null)
+            map = FixedValues.DefaultMap;
+        else
+            map = userIdentity.playerData.LastMultiLocation;
         Map foundMap = GetMapByName(map);
         foundMap.AssignUserToLayer(userIdentity);
     }
@@ -69,6 +74,6 @@ public class MapManager extends EntitySystem {
 
     public void RemoveUserByConnectionID(int connectionID){
         UserIdentity userIdentity = GetUserByConnectionID(connectionID);
-        userIdentity.RemoveUserIdentity();
+        userIdentity.RemoveUserIdentityFromLayer();
     }
 }

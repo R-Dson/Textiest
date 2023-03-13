@@ -55,7 +55,7 @@ public class ServerClass extends ApplicationAdapter {
 
 		//setups
 		ItemManager.LoadItems();
-		ActionManager.LoadActions();
+		//ActionManager.LoadActions();
 		MapManager.LoadMaps();
 		Engine.addSystem(MapManager);
 
@@ -81,14 +81,14 @@ public class ServerClass extends ApplicationAdapter {
 		if (EntityUpdateTimer > 1/10f){
 			//EntityManager.Update(EntityUpdateTimer);
 			EntityUpdateTimer -= 1/10f;
-		}*/
+		}
 
 		for (MapEntity mapEntity : MapManager.mapEntities) {
-			Map map = mapEntity.getComponent(Map.class);
-			for (MapLayer mapLayer : map.getMapLayers()) {
+			//Map map = mapEntity.getComponent(Map.class);
+			/*for (MapLayer mapLayer : map.getMapLayers()) {
 				mapLayer.render(delta, mapEntity);
 			}
-		}
+		}*/
 		batch.begin();
 
 		batch.end();

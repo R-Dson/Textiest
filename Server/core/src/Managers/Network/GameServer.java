@@ -1,12 +1,17 @@
 package Managers.Network;
 
 import DataShared.Network.NetworkMessages.*;
+import DataShared.Network.NetworkMessages.Client.*;
+import DataShared.Network.NetworkMessages.ErrorEnum;
+import DataShared.Network.NetworkMessages.Server.ChangeScene;
+import DataShared.Network.NetworkMessages.Server.LoginError;
+import DataShared.Network.NetworkMessages.Server.LoginResult;
 import DataShared.Network.UpdatePackageToServer;
 import DataShared.Player.PlayerData;
 import Managers.*;
+import Managers.Map.Map;
 import Managers.Map.MapManager;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -97,13 +102,54 @@ public class GameServer {
                 UpdatePackageToServer updatePackageToServer = (UpdatePackageToServer)obj;
                 UserIdentity ui = EntityManager.getUserIdentityByConnectID(connection.getID());
                 RecievedManager.AddMovementRequest(ui, updatePackageToServer.inputsAsIntegers);
+
+                try
+                {
+                    for (SendMessage message : updatePackageToServer.messages) {
+                        switch (message.chatEnum) {
+                            case PUBLIC:
+                                ui.currentLayer.addChatMessage(message, ui);
+                                break;
+                            case PARTY:
+                                break;
+                        }
+
+                    }
+                }
+                catch (NullPointerException e)
+                {
+
+                }
+
+                InteractObjectRequest ior = updatePackageToServer.interactObjectRequest;
+                if (ior != null)
+                    ui.currentLayer.BeginInteractWithObject(ui, ior.objectID);
+
+                /*switch (ior.interactObjectType) {
+                    case TREE:
+                        identity.currentLayer.BeginInteractWithObject(identity, ior.objectID, ior.interactObjectType);
+                        break;
+                    case ORE:
+                        break;
+                }*/
+
+                if (updatePackageToServer.changeMapFromClient != null)
+                {
+                    int newMapId = updatePackageToServer.changeMapFromClient.mapID;
+                    Map newMap = ui.currentMap.getConnectedMaps().stream().filter(m -> m.ID == newMapId).findFirst().orElse(null);
+                    if (newMap != null)
+                    {
+                        ui.RemoveUserIdentityFromLayer();
+                        newMap.AssignUserToLayer(ui);
+                        ui.setChangeMap(true);
+                    }
+                }
+
             }
             else if (obj instanceof CreationRequest){
                 CreationRequest cr = (CreationRequest)obj;
 
                 UserIdentity identity = EntityManager.getUserIdentityByConnectID(connection.getID());
-                identity.playerData.playerTextureName = cr.playerData.playerTextureName;
-                //identity.playerData.playerTextureID = cr.playerData.playerTextureID;
                 identity.playerData.Name = identity.UserName + "." + cr.playerData.Name;
 
                 identity.playerData.doneCharacterCreation = true;
@@ -113,10 +159,6 @@ public class GameServer {
                 ChangeScene changeScene = new ChangeScene();
                 changeScene.sceneName = SceneNameEnum.MainScene;
                 connection.sendTCP(changeScene);
-
-            }
-            else if (obj instanceof AssignRequest)
-            {
 
             }
 
@@ -148,7 +190,7 @@ public class GameServer {
                     ChangeScene changeScene = new ChangeScene();
                     //assign to a map and layer
                     UserIdentity identity = new UserIdentity(request.UniqueID, connection.getID());
-                    identity.UserName = request.Username;
+                    identity.UserName = dataSQL.UserName;
                     identity.playerData = dataSQL;
                     ToBeAssigned.add(identity);
 
@@ -255,12 +297,12 @@ public class GameServer {
 
             while (iterator.hasNext())
             {
-                //TODO
-                UserIdentity next = (UserIdentity)iterator.next();
+                UserIdentity next = iterator.next();
                 String data = SQLManager.requestData(next.UserName);
                 next.playerData = json.fromJson(PlayerData.class, data);
                 EntityManager.EntityList.put(next.connectionID, next);
                 MapManager.AssignLogin(next);
+
                 iterator.remove();
             }
         }
@@ -268,8 +310,8 @@ public class GameServer {
 
     private void UpdateRecieved(float delta){
         while (RecievedManager.HasMovementRequest()){
-            RecievedManager.MovementRequest request = RecievedManager.GetMovementRequest();
-            InputManager.CalculateMovement(request.userIdentity, request.movementList);
+            //RecievedManager.MovementRequest request = RecievedManager.GetMovementRequest();
+            //InputManager.CalculateMovement(request.userIdentity, request.movementList);
         }
     }
 

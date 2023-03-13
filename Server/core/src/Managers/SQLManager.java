@@ -22,7 +22,7 @@ public class SQLManager {
         System.out.println("SQL string: " + _fullURL);
     }
 
-    //returns ecrypted password
+    //returns encrypted password
     public String requestUsernameExist(String username){
         try(Connection connection = DriverManager.getConnection(_fullURL, _ID, _ConnectionCredential))
         {

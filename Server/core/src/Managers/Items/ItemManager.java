@@ -1,6 +1,8 @@
 package Managers.Items;
 
 import Data.FixedValues;
+import Data.Objects.Ore;
+import Data.Objects.WorldObject;
 import DataShared.Item.EquipmentItem;
 import DataShared.Item.Item;
 import DataShared.Item.ItemEnums;
@@ -10,24 +12,26 @@ import java.util.ArrayList;
 
 public class ItemManager {
 
-    public ArrayList<EquipmentItem> itemList = new ArrayList<>();
+    public ArrayList<EquipmentItem> itemEquipList = new ArrayList<>();
+    public ArrayList<Item> itemList = new ArrayList<>();
 
     public void LoadItems(){
+        itemEquipList = FileManager.LoadItemsEquipFromFile();
         itemList = FileManager.LoadItemsFromFile();
     }
     //TODO Add item generator
 
     //TODO ASYNC?
     public EquipmentItem GetRandomBaseItem(){
-        if(itemList == null) return null;
-        int n = FixedValues.random.nextInt(itemList.size() + 1);
-        EquipmentItem tempItem = itemList.get(n);
+        if(itemEquipList == null) return null;
+        int n = FixedValues.random.nextInt(itemEquipList.size() + 1);
+        EquipmentItem tempItem = itemEquipList.get(n);
 
         //repeats until it finds an item
         while (tempItem.ItemRarity != ItemEnums.ItemRarity.NORMAL)
         {
-            n = FixedValues.random.nextInt(itemList.size() + 1);
-            tempItem = itemList.get(n);
+            n = FixedValues.random.nextInt(itemEquipList.size() + 1);
+            tempItem = itemEquipList.get(n);
         }
         return tempItem;
     }
@@ -39,12 +43,23 @@ public class ItemManager {
         if (n != -1){
             items[n] = item;
         }
-        else{
+        else {
             //Drop item
-
-
         }
         return items;
+    }
+
+    public Item getItemFromList(WorldObject object) throws CloneNotSupportedException {
+        if (object instanceof Ore)
+        {
+            Ore ore = (Ore) object;
+            for (Item item : itemList) {
+                if (item.Material == ore.getOreType())
+                    return item.clone();
+            }
+
+        }
+        return null;
     }
 
     public static int FindFirstNullInArray(Object[] array){
