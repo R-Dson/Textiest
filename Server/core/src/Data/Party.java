@@ -15,7 +15,10 @@ public class Party {
     public void addUser(UserIdentity userIdentity)
     {
         userIdentities.add(userIdentity);
-        userIdentity.setParty(this);
+        userIdentities.forEach(UserIdentity::updateParty);
+
+        // might not need this?
+        userIdentity.addToParty(this);
     }
 
     public void removeUserByUniqueID(String uID)
@@ -28,6 +31,7 @@ public class Party {
     {
         userIdentities.remove(userIdentity);
         userIdentity.removeParty();
+        userIdentities.forEach(UserIdentity::updateParty);
     }
 
     public ArrayList<String> getUserNames()

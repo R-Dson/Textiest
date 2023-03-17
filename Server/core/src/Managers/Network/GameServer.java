@@ -78,11 +78,11 @@ public class GameServer {
 
         @Override
         public void disconnected(Connection connection) {
-            UserIdentity identity = EntityManager.getUserIdentityByConnectID(connection.getID());
+            UserIdentity identity = Managers.EntityManager.getUserIdentityByConnectID(connection.getID());
             if (identity != null){
                 String jsonString = json.toJson(identity.playerData);
                 SQLManager.UpdateData(identity.UserName, jsonString);
-                EntityManager.RemoveUserIdentity(identity);
+                Managers.EntityManager.RemoveUserIdentity(identity);
             }
         }
 
@@ -100,7 +100,7 @@ public class GameServer {
             }
             else if (obj instanceof UpdatePackageToServer){
                 UpdatePackageToServer updatePackageToServer = (UpdatePackageToServer)obj;
-                UserIdentity ui = EntityManager.getUserIdentityByConnectID(connection.getID());
+                UserIdentity ui = Managers.EntityManager.getUserIdentityByConnectID(connection.getID());
                 RecievedManager.AddMovementRequest(ui, updatePackageToServer.inputsAsIntegers);
 
                 try
@@ -125,14 +125,6 @@ public class GameServer {
                 if (ior != null)
                     ui.currentLayer.BeginInteractWithObject(ui, ior.objectID);
 
-                /*switch (ior.interactObjectType) {
-                    case TREE:
-                        identity.currentLayer.BeginInteractWithObject(identity, ior.objectID, ior.interactObjectType);
-                        break;
-                    case ORE:
-                        break;
-                }*/
-
                 if (updatePackageToServer.changeMapFromClient != null)
                 {
                     int newMapId = updatePackageToServer.changeMapFromClient.mapID;
@@ -141,7 +133,8 @@ public class GameServer {
                     {
                         ui.RemoveUserIdentityFromLayer();
                         newMap.AssignUserToLayer(ui);
-                        ui.setChangeMap(true);
+
+                        ui.sendChangeMap();
                     }
                 }
 
@@ -149,7 +142,7 @@ public class GameServer {
             else if (obj instanceof CreationRequest){
                 CreationRequest cr = (CreationRequest)obj;
 
-                UserIdentity identity = EntityManager.getUserIdentityByConnectID(connection.getID());
+                UserIdentity identity = Managers.EntityManager.getUserIdentityByConnectID(connection.getID());
                 identity.playerData.Name = identity.UserName + "." + cr.playerData.Name;
 
                 identity.playerData.doneCharacterCreation = true;
@@ -300,7 +293,7 @@ public class GameServer {
                 UserIdentity next = iterator.next();
                 String data = SQLManager.requestData(next.UserName);
                 next.playerData = json.fromJson(PlayerData.class, data);
-                EntityManager.EntityList.put(next.connectionID, next);
+                Managers.EntityManager.EntityList.put(next.connectionID, next);
                 MapManager.AssignLogin(next);
 
                 iterator.remove();

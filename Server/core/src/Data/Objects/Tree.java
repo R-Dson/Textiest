@@ -62,6 +62,35 @@ public class Tree extends WorldObject{
         numberOfLogsLeft = totalNumberOfLogs;
     }
 
+    @Override
+    public void activity(UserIdentity userIdentity, ObjectActivity objectActivity)
+    {
+        super.activity(userIdentity, objectActivity);
+        try{
+            Item item = ServerClass.ItemManager.getItemFromList(this);
+            numberOfLogsLeft--;
+            PlayerManager.AddItemToInventory(userIdentity, item);
+
+            Gdx.app.log("STATUS", "Cut log " + getObjectName());
+
+            if (numberOfLogsLeft <= 0)
+            {
+                super.setUsable(false);
+                Gdx.app.log("STATUS", "Depleted.");
+
+                getMapLayer().sendObjectLayerUpdate();
+
+                objectActivity.removeObjectActivityFromUserIdentity();
+            }
+
+        }
+        catch (CloneNotSupportedException | NullPointerException e)
+        {
+            Gdx.app.log("ERROR", "Tree Error.");
+        }
+
+    }
+
     public boolean ChopLog(UserIdentity userIdentity)
     {
         try{

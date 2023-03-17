@@ -8,12 +8,12 @@ import Data.Objects.WorldObject;
 import DataShared.Network.NetworkMessages.Client.SendMessage;
 import Managers.Chat.ChatMessage;
 import Managers.ChatManager;
+import Managers.Entity.Events.Layer.LayerMessageEvent;
+import Managers.Entity.Events.Layer.LayerObjectEvent;
+import Managers.Entity.LayerEvent;
 import Managers.Network.UserIdentity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 public class MapLayer {
     public String MapName;
@@ -25,18 +25,22 @@ public class MapLayer {
     public boolean ToDestroy = false;
     private float totalTime = 0;
     private float timer = 0;
-    private ArrayList<WorldObject> layerObjects;
-    private ArrayList<ObjectActivity> objectActivities;
     private boolean updatedObjects;
+
+    private final LinkedHashSet<LayerEvent> events;
+    private final ArrayList<WorldObject> layerObjects;
+    private final ArrayList<ObjectActivity> objectActivities;
 
     public MapLayer(Map map, String MapName, long LayerID, String CreatorID){
         this.MapName = MapName;
         this.LayerID = LayerID;
         this.CreatorID = CreatorID;
         this.map = map;
+
         chatManager = new ChatManager();
         layerObjects = new ArrayList<>();
         objectActivities = new ArrayList<>();
+        events = new LinkedHashSet<>();
         updatedObjects = false;
 
         generateLayerObjects();
@@ -47,6 +51,7 @@ public class MapLayer {
         timer += delta;
         if (users.size() > 0)
             totalTime = 0;
+
         //If there's no activity for 15 min, destroy layer
         if (totalTime > 15 * 60 * 1000){
             ToDestroy = true;
@@ -54,28 +59,23 @@ public class MapLayer {
         updatedObjects = false;
 
         while (timer >= FixedValues.UpdateFrequency5){
-            //world.step(FixedValues.UpdateFrequency30, 6, 2);
-            chatManager.addMessagesToUsers(users.values());
+
+            Iterator<LayerEvent> ei = events.iterator();
+
+            while (ei.hasNext())
+            {
+                LayerEvent le = ei.next();
+                le.eventUpdate();
+                ei.remove();
+            }
+
+            //chatManager.addMessagesToUsers(users.values());
 
             layerObjects.forEach(lo -> lo.Update(delta));
 
-            boolean anyUpdate = updatedObjects;
-            Iterator it = objectActivities.iterator();
-            while (it.hasNext())
-            {
-
-                ObjectActivity objectActivity = (ObjectActivity) it.next();
-
-                // update object
-                if (!anyUpdate)
-                    anyUpdate = objectActivity.Update(delta);
-
-                if (!objectActivity.getWorldObject().getUsable()) {
-                    objectActivity.removeObjectFromUserIdentity();
-                    it.remove();
-                }
+            for (ObjectActivity objectActivity : objectActivities) {
+                objectActivity.Update(delta);
             }
-            updatedObjects = anyUpdate;
 
             // always last
             users.values().forEach(userIdentity -> userIdentity.Update(delta));
@@ -123,10 +123,15 @@ public class MapLayer {
         }
     }
 
-    public void setUpdatedObjects(boolean updatedObjects)
+    public void removeObjectActivity(ObjectActivity objectActivity)
+    {
+        objectActivities.remove(objectActivity);
+    }
+
+    /*public void setUpdatedObjects(boolean updatedObjects)
     {
         this.updatedObjects = updatedObjects;
-    }
+    }*/
 
     public void BeginInteractWithObject(UserIdentity userIdentity, int objectID)
     {
@@ -136,6 +141,11 @@ public class MapLayer {
             return;
 
         objectActivities.add(new ObjectActivity(object, userIdentity));
+    }
+
+    public void sendObjectLayerUpdate()
+    {
+        events.add(new LayerObjectEvent(users.values(), layerObjects));
     }
 
     public WorldObject getObjectByID(int objectID)
@@ -148,23 +158,24 @@ public class MapLayer {
         return updatedObjects;
     }
 
+    public void addLayerEvent(LayerEvent event)
+    {
+        events.add(event);
+    }
+
     public void addChatMessage(SendMessage message, UserIdentity userIdentity)
     {
         ChatMessage cm = new ChatMessage(message.Message, userIdentity, message.chatEnum);
         chatManager.appendChatMessage(cm);
-
+        events.add(new LayerMessageEvent(chatManager, users.values()));
     }
 
     public void AddUserToLayer(UserIdentity userIdentity){
         userIdentity.currentLayer = this;
         users.put(userIdentity.connectionID, userIdentity);
+        userIdentity.sendChangeMap();
+
     }
-/*
-    public void MoveUserToLayer(UserIdentity userIdentity, MapLayer newLayer){
-        if (newLayer == null) return;
-        users.remove(userIdentity);
-        newLayer.AddUserToLayer(userIdentity);
-    }*/
 
     public void RemoveUserFromLayerID(Integer connectID){
         users.remove(connectID);

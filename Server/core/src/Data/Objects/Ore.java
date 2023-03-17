@@ -37,6 +37,12 @@ public class Ore extends WorldObject{
         generateNumberOfLogs();
     }
 
+    @Override
+    public void reset()
+    {
+        respawnOre();
+    }
+
     public void respawnOre()
     {
         numberOfStonesLeft = totalNumberOfStones;
@@ -51,9 +57,6 @@ public class Ore extends WorldObject{
         super.Update(delta);
         if (getUsable())
             return;
-
-        if (getTimer() >= this.getRespawnTimerMillis()/1000f)
-            respawnOre();
     }
 
     private void generateNumberOfLogs() {
@@ -61,26 +64,32 @@ public class Ore extends WorldObject{
         numberOfStonesLeft = totalNumberOfStones;
     }
 
-    public boolean mineOre(UserIdentity userIdentity)
-    {
+    @Override
+    public void activity(UserIdentity userIdentity, ObjectActivity objectActivity) {
+        super.activity(userIdentity, objectActivity);
         try{
             Item item = ServerClass.ItemManager.getItemFromList(this);
-            //Item ore = ServerClass.ItemManager.itemList.stream().filter(i -> i.ID == this.getObjectID()).findFirst().get().clone();
+
             numberOfStonesLeft--;
             PlayerManager.AddItemToInventory(userIdentity, item);
+
             Gdx.app.log("STATUS", "Mined " + item.Name);
+
             if (numberOfStonesLeft <= 0)
             {
                 super.setUsable(false);
-                Gdx.app.log("STATUS", "Ore depleted.");
-                return true;
-            }
-        }catch (NullPointerException | CloneNotSupportedException e)
-        {
-            Gdx.app.log("ERROR", "Failed to get item.");
-        }
-        return false;
+                Gdx.app.log("STATUS", "Depleted.");
 
+                getMapLayer().sendObjectLayerUpdate();
+
+                objectActivity.removeObjectActivityFromUserIdentity();
+            }
+
+        }
+        catch (NullPointerException | CloneNotSupportedException e)
+        {
+            Gdx.app.log("ERROR", "Ore Error.");
+        }
     }
 
     public Material getOreType() {

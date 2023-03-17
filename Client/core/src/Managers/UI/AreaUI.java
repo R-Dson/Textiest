@@ -42,6 +42,9 @@ public class AreaUI extends VisTable {
 
     public void updateOtherUsers(ArrayList<PlayerData> others)
     {
+        if (others == null)
+            return;
+
         if (userPanel != null && userPanel.getChildren().size < 2 && others.size() == 0)
             return;
 

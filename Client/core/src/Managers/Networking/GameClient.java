@@ -156,7 +156,7 @@ public class GameClient {
                         PlayerManager.playerData = pkg.receiverData;
                         ms.updateData();
                     }
-                    OtherPlayerManager.OtherPlayerData = pkg.OtherPlayers;
+                    OtherPlayerManager.OtherPlayerData = pkg.otherPlayers;
 
 
 

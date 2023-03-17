@@ -2,22 +2,22 @@ package Managers.Network;
 
 import Data.FixedValues;
 import Data.Objects.ObjectActivity;
-import Data.Objects.Ore;
-import Data.Objects.Tree;
 import Data.Objects.WorldObject;
 import Data.Party;
 import DataShared.Network.NetworkMessages.Server.*;
 import DataShared.Player.PlayerData;
 import Managers.Chat.ChatMessage;
-import Managers.EntityManager;
+import Managers.Entity.Events.User.*;
+import Managers.Entity.UserEvent;
 import Managers.Map.Map;
 import Managers.Map.MapLayer;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.vaniljstudio.server.ServerClass;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 public class UserIdentity extends Entity {
     public String UniqueID;
@@ -30,31 +30,18 @@ public class UserIdentity extends Entity {
     public ArrayList<String> ignoreUniqueID;
     private Party party;
     private float timer = 0;
-    private ArrayList<ChatMessage> newMessages;
-    private ObjectActivity objectActivity;
-    private boolean updatedUserInfo;
-    private boolean changeMap;
-    private ArrayList<String> partyNames;
-    private boolean leaveParty;
-    private boolean updateFriends;
-    private boolean updateIgnore;
+
+    private final ArrayList<ChatMessage> newMessages;
+    private final LinkedHashSet<UserEvent> updateEvents;
 
 
     public UserIdentity(String UniqueID, int connectionID){
         this.UniqueID = UniqueID;
         this.connectionID = connectionID;
         newMessages = new ArrayList<>();
-        updatedUserInfo = true;
-        changeMap = true;
-        leaveParty = false;
-        updateFriends = true;
-        updateIgnore = true;
         friendsUniqueID = new ArrayList<>();
         ignoreUniqueID = new ArrayList<>();
-    }
-
-    public void RemoveUserIdentityFromLayer(){
-        currentLayer.RemoveUserFromLayer(this);
+        updateEvents = new LinkedHashSet<>();
     }
 
     public void Update(float delta) {
@@ -63,47 +50,20 @@ public class UserIdentity extends Entity {
         UpdatePackage updatePackage = new UpdatePackage();
         //Sets data
 
-        if (updatedUserInfo) {
-            updatePackage.receiverData = playerData;
-            updatedUserInfo = false;
-        }
-
-        FillOtherUsers(updatePackage);
-
-        updateMessages(updatePackage);
-
-        if (changeMap) {
-            changeMap(updatePackage);
-            updateMapObjects(updatePackage);
-            changeMap = false;
-        }
-        else if (currentLayer.getUpdatedObjects())
-            updateMapObjects(updatePackage);
-
-
-        if (objectActivity != null) {
-            updateStatus(updatePackage);
-        }
-
-        if (leaveParty)
+        Iterator<UserEvent> ui = updateEvents.iterator();
+        if (updateEvents.size() > 0)
         {
-            leaveParty(updatePackage);
-            leaveParty = false;
-        }
-        else if(party != null)
-        {
-            updatePartyNames(updatePackage);
-        }
+            while (ui.hasNext()) {
+                UserEvent e = ui.next();
+                e.addEventToPackage(updatePackage);
 
-        if (updateFriends)
-        {
-            updateFriends(updatePackage);
-            updateFriends = false;
+                ui.remove();
+            }
+
+            ServerClass.GameServer.getServer().sendToTCP(connectionID, updatePackage);
+
         }
 
-
-        ServerClass.GameServer.getServer().sendToTCP(connectionID, updatePackage);
-        //System.out.println("Sent data to " + connectionID);
 
         if (timer >= FixedValues.UpdateFrequency5)
         {
@@ -111,146 +71,90 @@ public class UserIdentity extends Entity {
             timer -= FixedValues.UpdateFrequency5;
         }
 
-        //TODO SEND INFORMATION TO USER
-
     }
 
-    public void setUpdatedUserInfo(boolean updatedUserInfo) {
-        this.updatedUserInfo = updatedUserInfo;
+    public void RemoveUserIdentityFromLayer(){
+        currentLayer.RemoveUserFromLayer(this);
+    }
+
+
+    // PLAYER
+
+    public void sendUpdateDataSignal()
+    {
+        updateEvents.add(new UserUpdateEvent(playerData));
     }
 
     public void addPlayerMessages(ArrayList<ChatMessage> newMessages)
     {
         this.newMessages.addAll(newMessages);
+        updateEvents.add(new MessageEvent(this.newMessages));
+        this.newMessages.clear();
     }
 
-    private void updateMessages(UpdatePackage updatePackage)
+    public void sendObjectSignal(ArrayList<WorldObject> worldObjects)
     {
-        ArrayList<DataShared.Network.NetworkMessages.ChatMessage> msgs = new ArrayList<>();
-        for (ChatMessage newMessage : newMessages) {
-            DataShared.Network.NetworkMessages.ChatMessage chatMessage = new DataShared.Network.NetworkMessages.ChatMessage();
-            chatMessage.ChatMessage = newMessage.message;
-            chatMessage.UserName = newMessage.userIdentity.UserName;
-            chatMessage.date = newMessage.date;
-            chatMessage.chatEnum = newMessage.chatEnum;
-            msgs.add(chatMessage);
-        }
-        newMessages.clear();
-        ChatMessages cm = new ChatMessages();
-        cm.messages = msgs;
-        updatePackage.newMessages = cm;
+        updateEvents.add(new ObjectEvent(worldObjects));
     }
 
-    private void changeMap(UpdatePackage updatePackage)
+    // ZONE
+
+    public void sendChangeMap()
     {
-        ChangeMapFromServer cm = new ChangeMapFromServer();
-        cm.ID = currentMap.ID;
-        cm.MapName = currentMap.MapName;
-        cm.MapType = currentMap.MapType;
-        cm.connectedID = currentMap.getConnectedMapsID();
-        cm.connectedName = currentMap.getConnectedMapNames();
-
-        updatePackage.changeMapFromServer = cm;
-    }
-
-    public void updateMapObjects(UpdatePackage updatePackage)
-    {
-        UpdateObjects updateObjects = new UpdateObjects();
-        updateObjects.sentWorldObjects = new ArrayList<>();
-
-        for (WorldObject layerObject : currentLayer.getLayerObjects()) {
-            SentWorldObject swo = new SentWorldObject();
-            swo.isUsable = layerObject.getUsable();
-            swo.objectID = layerObject.getObjectID();
-            swo.objectName = layerObject.getObjectName();
-            updateObjects.sentWorldObjects.add(swo);
-        }
-
-        updatePackage.updateObjects = updateObjects;
-
-    }
-
-    public void updateStatus(UpdatePackage updatePackage)
-    {
-        PlayerStatus playerStatus = new PlayerStatus();
-        WorldObject object = objectActivity.getWorldObject();
-        if (object != null) // should never be null
-        {
-            playerStatus.objectName = object.getObjectName();
-            playerStatus.objectID = object.getObjectID();
-
-            if (object instanceof Ore)
-                playerStatus.interactObjectType = PlayerStatus.InteractObjectType.ORE;
-            else if (object instanceof Tree)
-                playerStatus.interactObjectType = PlayerStatus.InteractObjectType.TREE;
-
-            updatePackage.playerStatus = playerStatus;
-        }
+        updateEvents.add(new ChangeMapEvent(currentMap));
     }
 
     public void setObjectActivity(ObjectActivity objectActivity) {
-        this.objectActivity = objectActivity;
+        updateEvents.add(new PlayerStatusEvent(objectActivity));
     }
 
-    private void FillOtherUsers(UpdatePackage UpdatePackage){
-        if(currentLayer != null)
-            for (UserIdentity userIdentity : currentLayer.users.values())
-                if (!userIdentity.equals(this))
-                    UpdatePackage.OtherPlayers.add(userIdentity.playerData);
-    }
+    // PARTY
 
-    public void setParty(Party party)
+    public void addToParty(Party party)
     {
         this.party = party;
-    }
-
-    public void updatePartyNames(UpdatePackage updatePackage)
-    {
-        ArrayList<String> names = party.getUserNames();
-        if (!names.equals(partyNames))
-        {
-            updatePackage.updateParty = new UpdateParty();
-            updatePackage.updateParty.PartyList = names;
-            partyNames = names;
-        }
-    }
-
-    private void updateFriends(UpdatePackage updatePackage)
-    {
-        try{
-            updatePackage.updateFriends = new UpdateFriends();
-            updatePackage.updateFriends.FriendsList = new ArrayList<>();
-            friendsUniqueID.forEach(f -> updatePackage.updateFriends.FriendsList.add(EntityManager.getEntityByUniqueID(f).UserName));
-        }
-        catch (NullPointerException e)
-        {
-            Gdx.app.log("ERROR", "Failed to add friend.");
-        }
-    }
-
-    private void leaveParty(UpdatePackage updatePackage)
-    {
-        updatePackage.updateParty = new UpdateParty();
-        updatePackage.updateParty.PartyList = new ArrayList<>();
-        partyNames.clear();
+        updateParty();
     }
 
     public void removeParty()
     {
         party = null;
-        leaveParty = true;
+        updateParty();
     }
 
-    public void AddFriend(String uniqueID)
+    public void updateParty()
+    {
+        if (party != null)
+            updateEvents.add(new PartyEvent(party.getUserNames()));
+        else
+            updateEvents.add(new PartyEvent(null));
+
+    }
+
+    // SOCIAL
+
+    public void addIgnore(String uniqueID)
+    {
+        ignoreUniqueID.add(uniqueID);
+        updateEvents.add(new IgnoreEvent(ignoreUniqueID));
+    }
+
+    public void removeIgnore(String uniqueID)
+    {
+        ignoreUniqueID.add(uniqueID);
+        updateEvents.add(new IgnoreEvent(ignoreUniqueID));
+    }
+
+    public void addFriend(String uniqueID)
     {
         friendsUniqueID.add(uniqueID);
-        updateFriends = true;
+        updateEvents.add(new FriendsEvent(friendsUniqueID));
     }
 
     public void removeFriend(String uniqueID)
     {
         friendsUniqueID.remove(uniqueID);
-        updateFriends = true;
+        updateEvents.add(new FriendsEvent(friendsUniqueID));
     }
 
     @Override
@@ -260,12 +164,4 @@ public class UserIdentity extends Entity {
         return false;
     }
 
-    public boolean getChangeMap()
-    {
-        return changeMap;
-    }
-
-    public void setChangeMap(boolean changeMap) {
-        this.changeMap = changeMap;
-    }
 }

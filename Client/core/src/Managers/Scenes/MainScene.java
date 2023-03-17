@@ -229,6 +229,9 @@ public class MainScene extends Scene {
 
     public void addMessages(ChatMessages chatMessages)
     {
+        if (chatMessages == null)
+            return;
+
         for (ChatMessage message : chatMessages.messages) {
             chatWindow.appendMessage(message);
         }

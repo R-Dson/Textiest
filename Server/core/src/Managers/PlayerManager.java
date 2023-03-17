@@ -21,7 +21,7 @@ public class PlayerManager {
         int lowest = ItemManager.FindFirstNullInArray(pData.Inventory);
         if (lowest != -1) {
             pData.Inventory[lowest] = item;
-            userIdentity.setUpdatedUserInfo(true);
+            userIdentity.sendUpdateDataSignal();
         }
     }
 

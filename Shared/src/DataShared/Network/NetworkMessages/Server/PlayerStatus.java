@@ -8,6 +8,7 @@ public class PlayerStatus {
 
     public enum InteractObjectType
     {
+        NONE,
         TREE,
         ORE
     }

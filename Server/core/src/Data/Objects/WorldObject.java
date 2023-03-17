@@ -1,6 +1,7 @@
 package Data.Objects;
 
 import Managers.Map.MapLayer;
+import Managers.Network.UserIdentity;
 
 import java.util.Random;
 
@@ -10,7 +11,7 @@ public class WorldObject {
     private final int respawnTimerMillis;
     private boolean isUsable;
     private float timer = 0;
-    private MapLayer mapLayer;
+    private final MapLayer mapLayer;
 
     public WorldObject(MapLayer mapLayer, int ID, int respawnTimerMillis)
     {
@@ -19,6 +20,27 @@ public class WorldObject {
         this.respawnTimerMillis = respawnTimerMillis;
         this.isUsable = true;
     }
+
+    public void Update(float delta)
+    {
+        if (isUsable)
+        {
+            if (timer != 0)
+                timer = 0;
+            return;
+        }
+
+        timer += delta;
+
+        if (getTimer() >= this.getRespawnTimerMillis()) {
+            mapLayer.sendObjectLayerUpdate();
+            reset();
+        }
+    }
+
+    public void reset() { }
+
+    public void activity(UserIdentity userIdentity, ObjectActivity objectActivity) { }
 
     public void setObjectName(String objectName) {
         this.objectName = objectName;
@@ -48,22 +70,6 @@ public class WorldObject {
     public float getTimer() {
         return timer;
     }
-    
-    public void Update(float delta)
-    {
-        if (isUsable)
-        {
-            if (timer != 0)
-                timer = 0;
-            return;
-        }
-
-        timer += delta;
-
-        if (getTimer() >= this.getRespawnTimerMillis())
-            mapLayer.setUpdatedObjects(true);
-
-    }
 
     public static WorldObjectEnum getRandomObjectType()
     {
@@ -82,8 +88,8 @@ public class WorldObject {
         ROCK(2);
 
         private final int value;
-        public static int minValue = 0;
-        public static int maxValue = 2;
+        public static final int minValue = 0;
+        public static final int maxValue = 2;
 
         private WorldObjectEnum(int value) {
             this.value = value;

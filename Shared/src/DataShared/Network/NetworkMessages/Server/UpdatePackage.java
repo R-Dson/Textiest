@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class UpdatePackage {
     //All info in the update from server to user goes here
     public PlayerData receiverData;
-    public ArrayList<PlayerData> OtherPlayers = new ArrayList<>();
+    public ArrayList<PlayerData> otherPlayers;
     public ChatMessages newMessages;
     public ChangeMapFromServer changeMapFromServer;
     public PlayerStatus playerStatus;
