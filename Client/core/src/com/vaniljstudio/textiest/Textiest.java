@@ -19,7 +19,7 @@ public class Textiest extends ApplicationAdapter {
 	public static GameClient GameClient;
 	public static DataManager DataManager;
 
-	public static String uniqueID;
+	public static String uniqueConnectID;
 	public static Scene CurrentScene;
 	public static float INIT_WIDTH, INIT_HEIGHT;
 	

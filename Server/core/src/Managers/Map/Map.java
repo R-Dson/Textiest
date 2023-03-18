@@ -27,20 +27,10 @@ public class Map implements Component {
 
     //Info
 
-    private float timer = 0;
     public void Update(float delta){
-        //TODO CHANGE
-        timer += delta;
-/*
-        while (timer >= FixedValues.UpdateFrequency5){
-
-
-            timer -= FixedValues.UpdateFrequency5;
-        }*/
         MapLayers.removeIf(layer -> layer.ToDestroy);
-        for (MapLayer layer:MapLayers) {
-            layer.Update(delta);
-        }
+
+        MapLayers.forEach(ml -> ml.Update(delta));
     }
 
     public void MoveUserToNewMap(UserIdentity userIdentity, Map newMap){
@@ -75,7 +65,8 @@ public class Map implements Component {
             assignedLayer = CreateNewLayer(userIdentity.UniqueID);
         }
 
-        assignedLayer.AddUserToLayer(userIdentity);
+        if (assignedLayer != null)
+            assignedLayer.AddUserToLayer(userIdentity);
     }
 
     public MapLayer CreateNewLayer(String ID){
@@ -89,7 +80,7 @@ public class Map implements Component {
 
     public ArrayList<UserIdentity> GetAllUsers(){
         ArrayList<UserIdentity> identities = new ArrayList<>();
-        for (MapLayer layer:MapLayers) {
+        for (MapLayer layer : MapLayers) {
             identities.addAll(layer.users.values());
         }
         return identities;

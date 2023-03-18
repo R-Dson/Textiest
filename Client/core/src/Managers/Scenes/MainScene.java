@@ -5,7 +5,10 @@ import Data.updatePackageToServerDummy;
 import DataShared.Item.EquipmentItem;
 import DataShared.Item.Item;
 import DataShared.Item.ItemEnums;
+import DataShared.Network.NetworkMessages.Client.AddUserRequest;
 import DataShared.Network.NetworkMessages.Client.ChangeMapFromClient;
+import DataShared.Network.NetworkMessages.Client.IgnoreUserRequest;
+import DataShared.Network.NetworkMessages.Client.PartyInviteRequest;
 import DataShared.Network.NetworkMessages.Server.*;
 import DataShared.Network.NetworkMessages.ChatMessage;
 import DataShared.Network.UpdatePackageToServer;
@@ -34,6 +37,7 @@ public class MainScene extends Scene {
     private InputManager _InputManager;
     private Client _Client;
     private ChatUI chatWindow;
+    private SocialUI socialUI;
     private TabType currentTabType;
     SplitWindow rootWindow;
     VisTable utilWindow;
@@ -41,7 +45,6 @@ public class MainScene extends Scene {
     VisTable rightTopTable, rightBottomTable;
     CombatUI combat;
     AreaUI area;
-    SocialUI social;
 
     //private Vis
 
@@ -93,7 +96,20 @@ public class MainScene extends Scene {
 
     public void updateFriends(UpdateFriends updateFriends)
     {
+        if (updateFriends != null)
+            socialUI.updateUsersFriendsList(updateFriends.FriendsList);
+    }
 
+    public void updateIgnore(UpdateIgnore updateIgnore)
+    {
+        if (updateIgnore != null)
+            socialUI.updateUsersIgnoreList(updateIgnore.IgnoreList);
+    }
+
+    public void updateParty(UpdateParty updateParty)
+    {
+        if (updateParty != null)
+            socialUI.updateUsersParty(updateParty.PartyList);
     }
 
     @Override
@@ -138,6 +154,28 @@ public class MainScene extends Scene {
 
             if (updatePackageToServerDummy.getInteractObjectType() != null)
                 updatePackageToServer.interactObjectRequest = updatePackageToServerDummy.getInteractObjectType();
+
+            String uniqueID = area.getAddUniqueID();
+            if (uniqueID != null)
+            {
+                updatePackageToServer.addUserRequest = new AddUserRequest();
+                updatePackageToServer.addUserRequest.UniqueUserID = uniqueID;
+            }
+            area.setAddUniqueID(null);
+
+            uniqueID = area.getIgnoreUniqueID();
+            if (uniqueID != null)
+            {
+                updatePackageToServer.ignoreUserRequest = new IgnoreUserRequest();
+                updatePackageToServer.ignoreUserRequest.uniqueID = uniqueID;
+            }
+
+            uniqueID = area.getInvitePartyUniqueID();
+            if (uniqueID != null)
+            {
+                updatePackageToServer.partyInviteRequest = new PartyInviteRequest();
+                updatePackageToServer.partyInviteRequest.UniqueID = uniqueID;
+            }
 
 
             //Send data
@@ -197,7 +235,7 @@ public class MainScene extends Scene {
 
     private void buildLeft()
     {
-        area = new AreaUI(true);
+        area = new AreaUI(true, stage);
         combat = new CombatUI(true);
         SplitWindow leftSplit = new SplitWindow("", true, area, combat);
         rootWindow.getLeftTable().add(leftSplit).expand().fill();
@@ -222,7 +260,9 @@ public class MainScene extends Scene {
 
         // CHAT
         chatWindow = new ChatUI("Chat");
+        socialUI = new SocialUI();
         rightBottomTable.add(chatWindow).fill().expand();
+        rightBottomTable.add(socialUI).fillY().expandY();
 
         rootWindow.getRightTable().add(rightSplit).expand().fill();
     }

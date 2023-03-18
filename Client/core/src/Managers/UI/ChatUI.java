@@ -1,7 +1,7 @@
 package Managers.UI;
 
 import DataShared.Network.NetworkMessages.ChatMessage;
-import DataShared.Network.NetworkMessages.Client.SendMessage;
+import DataShared.Network.NetworkMessages.Client.Chat.SendMessage;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;

@@ -13,11 +13,10 @@ import Managers.Map.Map;
 import Managers.Map.MapLayer;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.vaniljstudio.server.ServerClass;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 public class UserIdentity extends Entity {
     public String UniqueID;
@@ -26,8 +25,8 @@ public class UserIdentity extends Entity {
     public MapLayer currentLayer;
     public Map currentMap;
     public String UserName;
-    public ArrayList<String> friendsUniqueID;
-    public ArrayList<String> ignoreUniqueID;
+    public HashSet<String> friendsUniqueIDs;
+    public ArrayList<String> ignoreUniqueIDs;
     private Party party;
     private float timer = 0;
 
@@ -39,8 +38,8 @@ public class UserIdentity extends Entity {
         this.UniqueID = UniqueID;
         this.connectionID = connectionID;
         newMessages = new ArrayList<>();
-        friendsUniqueID = new ArrayList<>();
-        ignoreUniqueID = new ArrayList<>();
+        friendsUniqueIDs = new HashSet<>();
+        ignoreUniqueIDs = new ArrayList<>();
         updateEvents = new LinkedHashSet<>();
     }
 
@@ -63,7 +62,6 @@ public class UserIdentity extends Entity {
             ServerClass.GameServer.getServer().sendToTCP(connectionID, updatePackage);
 
         }
-
 
         if (timer >= FixedValues.UpdateFrequency5)
         {
@@ -97,15 +95,31 @@ public class UserIdentity extends Entity {
         updateEvents.add(new ObjectEvent(worldObjects));
     }
 
+    public void sendUpdateFriends()
+    {
+        updateEvents.add(new FriendsEvent(friendsUniqueIDs));
+    }
+
+    public void sendUpdateIgnore()
+    {
+        updateEvents.add(new IgnoreEvent(ignoreUniqueIDs));
+    }
+
     // ZONE
 
     public void sendChangeMap()
     {
         updateEvents.add(new ChangeMapEvent(currentMap));
+        currentLayer.sendObjectLayerUpdate();
     }
 
     public void setObjectActivity(ObjectActivity objectActivity) {
         updateEvents.add(new PlayerStatusEvent(objectActivity));
+    }
+
+    public void sendNearbyPlayerChange(Collection<UserIdentity> userIdentities)
+    {
+        updateEvents.add(new OtherUsersEvent(userIdentities, this));
     }
 
     // PARTY
@@ -113,16 +127,16 @@ public class UserIdentity extends Entity {
     public void addToParty(Party party)
     {
         this.party = party;
-        updateParty();
+        sendUpdateParty();
     }
 
     public void removeParty()
     {
         party = null;
-        updateParty();
+        sendUpdateParty();
     }
 
-    public void updateParty()
+    public void sendUpdateParty()
     {
         if (party != null)
             updateEvents.add(new PartyEvent(party.getUserNames()));
@@ -135,26 +149,31 @@ public class UserIdentity extends Entity {
 
     public void addIgnore(String uniqueID)
     {
-        ignoreUniqueID.add(uniqueID);
-        updateEvents.add(new IgnoreEvent(ignoreUniqueID));
+        if (!ignoreUniqueIDs.add(uniqueID))
+            return;
+        sendUpdateIgnore();
+        Gdx.app.log("STATUS", "Added Ignore.");
     }
 
     public void removeIgnore(String uniqueID)
     {
-        ignoreUniqueID.add(uniqueID);
-        updateEvents.add(new IgnoreEvent(ignoreUniqueID));
+        ignoreUniqueIDs.add(uniqueID);
+        sendUpdateIgnore();
     }
 
     public void addFriend(String uniqueID)
     {
-        friendsUniqueID.add(uniqueID);
-        updateEvents.add(new FriendsEvent(friendsUniqueID));
+        Gdx.app.log("STATUS", "Attempting to add friend.");
+        if (!friendsUniqueIDs.add(uniqueID))
+            return;
+        sendUpdateFriends();
+        Gdx.app.log("STATUS", "Added friend.");
     }
 
     public void removeFriend(String uniqueID)
     {
-        friendsUniqueID.remove(uniqueID);
-        updateEvents.add(new FriendsEvent(friendsUniqueID));
+        friendsUniqueIDs.remove(uniqueID);
+        sendUpdateFriends();
     }
 
     @Override

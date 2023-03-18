@@ -108,7 +108,7 @@ public class GameClient {
         try{
             client.connect(5000, "localhost", 54555);
             ConnectionEstablished connectionEstablished = new ConnectionEstablished();
-            connectionEstablished.text = "Connected";
+            connectionEstablished.UniqueConnectID = "Connected";
             client.sendTCP(connectionEstablished);
             return true;
         }
@@ -145,8 +145,6 @@ public class GameClient {
             }
             else if (obj instanceof UpdatePackage)
             {
-
-
                 if (Textiest.CurrentScene instanceof MainScene)
                 {
                     MainScene ms = (MainScene) Textiest.CurrentScene;
@@ -158,18 +156,17 @@ public class GameClient {
                     }
                     OtherPlayerManager.OtherPlayerData = pkg.otherPlayers;
 
-
-
                     ms.updateUsers(OtherPlayerManager.OtherPlayerData);
                     ms.addMessages(pkg.newMessages);
                     ms.updateStatus(pkg.playerStatus);
+                    ms.updateFriends(pkg.updateFriends);
+                    ms.updateIgnore(pkg.updateIgnore);
 
                     if (pkg.changeMapFromServer != null)
                         ms.updateLocation(pkg.changeMapFromServer);
 
                     if (pkg.updateObjects != null)
                         ms.updateObjects(pkg.updateObjects.sentWorldObjects);
-                    //if (pkg.updateFriends != null)
 
                 }
             }
@@ -211,7 +208,7 @@ public class GameClient {
         }
 
         private void SetUpID(ConnectionEstablished ce){
-            Textiest.uniqueID = ce.text;
+            Textiest.uniqueConnectID = ce.UniqueConnectID;
         }
     }
 

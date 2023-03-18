@@ -15,7 +15,7 @@ public class Party {
     public void addUser(UserIdentity userIdentity)
     {
         userIdentities.add(userIdentity);
-        userIdentities.forEach(UserIdentity::updateParty);
+        userIdentities.forEach(UserIdentity::sendUpdateParty);
 
         // might not need this?
         userIdentity.addToParty(this);
@@ -31,7 +31,7 @@ public class Party {
     {
         userIdentities.remove(userIdentity);
         userIdentity.removeParty();
-        userIdentities.forEach(UserIdentity::updateParty);
+        userIdentities.forEach(UserIdentity::sendUpdateParty);
     }
 
     public ArrayList<String> getUserNames()

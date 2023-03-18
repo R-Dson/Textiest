@@ -2,6 +2,7 @@ package Managers.Network;
 
 import DataShared.Network.NetworkMessages.*;
 import DataShared.Network.NetworkMessages.Client.*;
+import DataShared.Network.NetworkMessages.Client.Chat.SendMessage;
 import DataShared.Network.NetworkMessages.ErrorEnum;
 import DataShared.Network.NetworkMessages.Server.ChangeScene;
 import DataShared.Network.NetworkMessages.Server.LoginError;
@@ -33,7 +34,7 @@ public class GameServer {
     private MapManager MapManager;
     private EntityManager EntityManager;
 
-    private ArrayList<UserIdentity> ToBeAssigned = new ArrayList<>();
+    private final ArrayList<UserIdentity> ToBeAssigned = new ArrayList<>();
 
     public void startServer(){
         SQLManager = ServerClass.SQLManager;
@@ -125,6 +126,13 @@ public class GameServer {
                 if (ior != null)
                     ui.currentLayer.BeginInteractWithObject(ui, ior.objectID);
 
+                //if (updatePackageToServer.partyInviteRequest != null)
+
+                if (updatePackageToServer.addUserRequest != null)
+                    ui.addFriend(updatePackageToServer.addUserRequest.UniqueUserID);
+                if (updatePackageToServer.ignoreUserRequest != null)
+                    ui.addIgnore(updatePackageToServer.ignoreUserRequest.uniqueID);
+
                 if (updatePackageToServer.changeMapFromClient != null)
                 {
                     int newMapId = updatePackageToServer.changeMapFromClient.mapID;
@@ -173,6 +181,7 @@ public class GameServer {
                     Json json = new Json();
                     PlayerData dataSQL = json.fromJson(PlayerData.class, data);
                     dataSQL.UserName = request.Username;
+                    dataSQL.UniqueConnectID = request.UniqueConnectID;
 
                     LoginResult result = new LoginResult();
 
@@ -182,7 +191,7 @@ public class GameServer {
                     //Change client scene
                     ChangeScene changeScene = new ChangeScene();
                     //assign to a map and layer
-                    UserIdentity identity = new UserIdentity(request.UniqueID, connection.getID());
+                    UserIdentity identity = new UserIdentity(request.UniqueConnectID, connection.getID());
                     identity.UserName = dataSQL.UserName;
                     identity.playerData = dataSQL;
                     ToBeAssigned.add(identity);
@@ -219,12 +228,12 @@ public class GameServer {
         }
 
         private void connectionEstablished(Connection connection, ConnectionEstablished obj){
-            String uniqueID = UUID.randomUUID().toString();
-            System.out.println("New connection. ID: " + connection.getID() + ", Unique ID: " + uniqueID);
+            String uniqueConnectID = UUID.randomUUID().toString();
+            System.out.println("New connection. ID: " + connection.getID() + ", Unique ID: " + uniqueConnectID);
 
             //Reply
             ConnectionEstablished ce = new ConnectionEstablished();
-            ce.text = uniqueID;
+            ce.UniqueConnectID = uniqueConnectID;
             connection.sendTCP(ce);
             ChangeScene changeScene = new ChangeScene();
             changeScene.sceneName = SceneNameEnum.LoginScene;
@@ -293,6 +302,8 @@ public class GameServer {
                 UserIdentity next = iterator.next();
                 String data = SQLManager.requestData(next.UserName);
                 next.playerData = json.fromJson(PlayerData.class, data);
+                if (next.playerData.UniqueUserID == null)
+                    next.playerData.UniqueUserID = UUID.randomUUID().toString();
                 Managers.EntityManager.EntityList.put(next.connectionID, next);
                 MapManager.AssignLogin(next);
 

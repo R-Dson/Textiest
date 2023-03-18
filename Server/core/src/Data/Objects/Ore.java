@@ -67,6 +67,7 @@ public class Ore extends WorldObject{
     @Override
     public void activity(UserIdentity userIdentity, ObjectActivity objectActivity) {
         super.activity(userIdentity, objectActivity);
+
         try{
             Item item = ServerClass.ItemManager.getItemFromList(this);
 

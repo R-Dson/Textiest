@@ -1,7 +1,6 @@
 package Data;
 
 import DataShared.Network.NetworkMessages.Client.InteractObjectRequest;
-import DataShared.Network.NetworkMessages.Client.SendMessage;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,7 @@
 package DataShared.Network;
 
-import DataShared.Network.NetworkMessages.Client.ChangeMapFromClient;
-import DataShared.Network.NetworkMessages.Client.InteractObjectRequest;
-import DataShared.Network.NetworkMessages.Client.SendMessage;
+import DataShared.Network.NetworkMessages.Client.*;
+import DataShared.Network.NetworkMessages.Client.Chat.SendMessage;
 
 import java.util.ArrayList;
 
@@ -12,4 +11,7 @@ public class UpdatePackageToServer {
     public ArrayList<SendMessage> messages;
     public ChangeMapFromClient changeMapFromClient;
     public InteractObjectRequest interactObjectRequest;
+    public PartyInviteRequest partyInviteRequest;
+    public AddUserRequest addUserRequest;
+    public IgnoreUserRequest ignoreUserRequest;
 }

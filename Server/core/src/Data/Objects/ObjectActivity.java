@@ -5,11 +5,12 @@ import Managers.Network.UserIdentity;
 import java.util.Random;
 
 public class ObjectActivity {
+    private final static float OBJECT_UPDATE_TIME = 0.5f;
 
     private final WorldObject worldObject;
     private final UserIdentity userIdentity;
     private final Random random = new Random();
-    private float timePassed = 0;
+    private float updateTimer = 0;
     public ObjectActivity(WorldObject worldObject, UserIdentity userIdentity){
         this.worldObject = worldObject;
         this.userIdentity = userIdentity;
@@ -21,18 +22,15 @@ public class ObjectActivity {
         if (!worldObject.getUsable())
             return false;
 
-        timePassed += delta;
-        if (timePassed > 500)
+        updateTimer += delta;
+        if (updateTimer > OBJECT_UPDATE_TIME)
         {
-            timePassed -= 500;
+            updateTimer -= OBJECT_UPDATE_TIME;
 
-            if (random.nextFloat() > 0.5)
-            {
+            if (random.nextFloat() > 0.9)
                 worldObject.activity(userIdentity, this);
-
-            }
-
         }
+
         return false;
     }
 

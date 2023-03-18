@@ -7,12 +7,10 @@ import DataShared.Network.NetworkMessages.Server.PlayerStatus;
 import DataShared.Network.NetworkMessages.Server.SentWorldObject;
 import DataShared.Player.PlayerData;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisScrollPane;
-import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,12 +21,18 @@ public class AreaUI extends VisTable {
     private VisLabel locationText;
     private VisTable connectedMapsTable;
     private VisTable worldObjectsTable;
+    private Stage stage;
 
     VisScrollPane userPanel;
 
-    public AreaUI(boolean vertical)
+    private String addUniqueID;
+    private String IgnoreUniqueID;
+    private String InvitePartyUniqueID;
+
+    public AreaUI(boolean vertical, Stage stage)
     {
         super(vertical);
+        this.stage = stage;
         locationText = new VisLabel();
         worldObjectsTable = new VisTable();
         usersTable = new VisTable();
@@ -52,18 +56,19 @@ public class AreaUI extends VisTable {
         VerticalGroup group = new VerticalGroup();
         group.addActor(new VisLabel("Players:"));
 
-        Iterator i = others.iterator();
-        while (i.hasNext())
-        {
-            PlayerData pd = (PlayerData)i.next();
-            group.addActor(new VisLabel(pd.UserName));
+        for (PlayerData pd : others) {
+            VisTextButton visTextButton = new VisTextButton(pd.UserName);
+
+            visTextButton.addListener(new LocalPlayerButtonListener(pd.UserName, pd.UniqueUserID, stage, this));
+
+            group.addActor(visTextButton);
 
         }
-
 
         userPanel = new VisScrollPane(group);
         userPanel.setFadeScrollBars(false);
         usersTable.add(userPanel).fill().expand();
+        userPanel.setWidth(100);
 
     }
 
@@ -87,7 +92,6 @@ public class AreaUI extends VisTable {
                         InteractObjectRequest interactObjectRequest = new InteractObjectRequest();
                         interactObjectRequest.objectID = objectID;
                         updatePackageToServerDummy.setInteractObjectType(interactObjectRequest);
-
                     }
                 }
             };
@@ -96,7 +100,7 @@ public class AreaUI extends VisTable {
             group.addActor(btn);
         }
         worldObjectsTable.clear();
-        worldObjectsTable.add(new VisLabel("Objects"));
+        worldObjectsTable.add(new VisLabel("Objects")).center();
         worldObjectsTable.row();
         VisScrollPane vs = new VisScrollPane(group);
         vs.setFadeScrollBars(false);
@@ -136,4 +140,33 @@ public class AreaUI extends VisTable {
 
     }
 
+    public String getAddUniqueID() {
+        String returnS = addUniqueID;
+        addUniqueID = null;
+        return returnS;
+    }
+
+    public void setAddUniqueID(String addUniqueID) {
+        this.addUniqueID = addUniqueID;
+    }
+
+    public String getIgnoreUniqueID() {
+        String returnS = IgnoreUniqueID;
+        IgnoreUniqueID = null;
+        return returnS;
+    }
+
+    public void setIgnoreUniqueID(String ignoreUniqueID) {
+        IgnoreUniqueID = ignoreUniqueID;
+    }
+
+    public String getInvitePartyUniqueID() {
+        String returnS = InvitePartyUniqueID;
+        InvitePartyUniqueID = null;
+        return returnS;
+    }
+
+    public void setInvitePartyUniqueID(String invitePartyUniqueID) {
+        InvitePartyUniqueID = invitePartyUniqueID;
+    }
 }

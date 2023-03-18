@@ -5,7 +5,7 @@ import Data.Objects.ObjectActivity;
 import Data.Objects.Ore;
 import Data.Objects.Tree;
 import Data.Objects.WorldObject;
-import DataShared.Network.NetworkMessages.Client.SendMessage;
+import DataShared.Network.NetworkMessages.Client.Chat.SendMessage;
 import Managers.Chat.ChatMessage;
 import Managers.ChatManager;
 import Managers.Entity.Events.Layer.LayerMessageEvent;
@@ -49,6 +49,7 @@ public class MapLayer {
     public void Update(float delta){
         totalTime += delta;
         timer += delta;
+
         if (users.size() > 0)
             totalTime = 0;
 
@@ -56,7 +57,10 @@ public class MapLayer {
         if (totalTime > 15 * 60 * 1000){
             ToDestroy = true;
         }
+
         updatedObjects = false;
+
+        objectActivities.forEach(o -> o.Update(delta));
 
         while (timer >= FixedValues.UpdateFrequency5){
 
@@ -73,9 +77,6 @@ public class MapLayer {
 
             layerObjects.forEach(lo -> lo.Update(delta));
 
-            for (ObjectActivity objectActivity : objectActivities) {
-                objectActivity.Update(delta);
-            }
 
             // always last
             users.values().forEach(userIdentity -> userIdentity.Update(delta));
@@ -173,12 +174,14 @@ public class MapLayer {
     public void AddUserToLayer(UserIdentity userIdentity){
         userIdentity.currentLayer = this;
         users.put(userIdentity.connectionID, userIdentity);
+        users.values().forEach(u -> u.sendNearbyPlayerChange(users.values()));
         userIdentity.sendChangeMap();
-
+        userIdentity.sendUpdateFriends();
     }
 
     public void RemoveUserFromLayerID(Integer connectID){
         users.remove(connectID);
+        users.values().forEach(u -> u.sendNearbyPlayerChange(users.values()));
     }
 
     public void RemoveUserFromLayer(UserIdentity userIdentity){

@@ -25,7 +25,7 @@ public class EntityManager {
     public static UserIdentity getEntityByUniqueID(final String uniqueID){
         for (UserIdentity e: EntityList.values())
             if (e != null)
-                if (e.UniqueID.equals(uniqueID))
+                if (e.playerData.UniqueUserID.equals(uniqueID))
                     return e;
         return null;
     }

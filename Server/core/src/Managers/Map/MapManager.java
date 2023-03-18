@@ -36,13 +36,9 @@ public class MapManager extends EntitySystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        for (MapEntity entity : mapEntities) {
+        for (MapEntity entity : mapEntities)
             if (entity != null)
-            {
                 entity.getComponent(Map.class).Update(deltaTime);
-                //map.Update(deltaTime);
-            }
-        }
     }
 
     public Map GetMapByName(String name){

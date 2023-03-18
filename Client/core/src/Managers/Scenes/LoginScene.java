@@ -60,7 +60,7 @@ public class LoginScene extends Scene {
                     request.Username = "t69";
                     //request.Username = "t";
                     //request.Password = "t";
-                    request.UniqueID = Textiest.uniqueID;
+                    request.UniqueConnectID = Textiest.uniqueConnectID;
                     client.getClient().sendTCP(request);
                 }
             }
