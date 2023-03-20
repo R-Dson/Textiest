@@ -284,10 +284,6 @@ public class GameServer {
             // Updates assignment to map/layer
             UpdateAssign(delta);
 
-            // Updates from received data
-            UpdateRecieved(delta);
-
-
             UTimer -= 0.25;
         }
     }
@@ -324,10 +320,7 @@ public class GameServer {
     }
 
     private void UpdateRecieved(float delta){
-        while (RecievedManager.HasMovementRequest()){
-            //RecievedManager.MovementRequest request = RecievedManager.GetMovementRequest();
-            //InputManager.CalculateMovement(request.userIdentity, request.movementList);
-        }
+
     }
 
     public Server getServer() {

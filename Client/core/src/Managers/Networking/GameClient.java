@@ -155,17 +155,13 @@ public class GameClient {
                         PlayerManager.playerData = pkg.receiverData;
                         ms.updateData();
                     }
-                    //OtherPlayerManager.OtherPlayerData = pkg.otherPlayers;
 
                     ms.updateUsers(pkg.otherPlayers);
-
                     ms.addMessages(pkg.newMessages);
                     ms.updateStatus(pkg.playerStatus);
                     ms.updateFriends(pkg.updateFriends);
                     ms.updateIgnore(pkg.updateIgnore);
-
-                    if (pkg.changeMapFromServer != null)
-                        ms.updateLocation(pkg.changeMapFromServer);
+                    ms.updateLocation(pkg.changeMapFromServer);
 
                     if (pkg.updateObjects != null)
                         ms.updateObjects(pkg.updateObjects.sentWorldObjects);
