@@ -1,16 +1,15 @@
 package Managers.Scenes;
 
+import Data.Events.*;
+import Data.Events.received.*;
 import Data.StaticValues;
 import Data.updatePackageToServerDummy;
 import DataShared.Item.EquipmentItem;
 import DataShared.Item.Item;
 import DataShared.Item.ItemEnums;
-import DataShared.Network.NetworkMessages.Client.AddUserRequest;
 import DataShared.Network.NetworkMessages.Client.ChangeMapFromClient;
-import DataShared.Network.NetworkMessages.Client.IgnoreUserRequest;
 import DataShared.Network.NetworkMessages.Client.PartyInviteRequest;
 import DataShared.Network.NetworkMessages.Server.*;
-import DataShared.Network.NetworkMessages.ChatMessage;
 import DataShared.Network.UpdatePackageToServer;
 import DataShared.Player.PlayerData;
 import Managers.CameraManager;
@@ -29,10 +28,10 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 public class MainScene extends Scene {
-
-    private MapManager _MapManager;
     private CameraManager _CameraManager;
     private InputManager _InputManager;
     private Client _Client;
@@ -44,60 +43,60 @@ public class MainScene extends Scene {
     VisTable ItemWindow;
     VisTable rightTopTable, rightBottomTable;
     CombatUI combat;
-    AreaUI area;
+    AreaUI areaUI;
 
     //private Vis
 
+    private final LinkedHashSet<Event> updateEvents;
+
     public MainScene(Client client){
         super();
+        currentTabType = TabType.INVENTORY;
+
         _Client = client;
+
+        updateEvents = new LinkedHashSet<>();
+
         ExtendViewport viewport = new ExtendViewport((int)_CameraManager.get_Camera().viewportWidth, (int)_CameraManager.get_Camera().viewportHeight);
         stage.setViewport(viewport);
         stage.getViewport().update((int)_CameraManager.get_Camera().viewportWidth, (int)_CameraManager.get_Camera().viewportHeight, true);
-        currentTabType = TabType.INVENTORY;
+
     }
 
     public void updateUsers(ArrayList<PlayerData> users)
     {
-        area.updateOtherUsers(users);
+        if (users != null)
+            addEvent(new UpdateOtherUsersEvent(areaUI, users, this, stage));
     }
 
     public void updateData()
     {
-        ItemWindow.clear();
-        switch (currentTabType) {
-            case STATS:
-                break;
-            case INVENTORY:
-                buildInventoryUI();
-                break;
-            case GEAR:
-                buildGearUI();
-                break;
-        }
+        addEvent(new UpdateDataEvent(this));
     }
 
     public void updateLocation()
     {
-        area.setLocationText(PlayerManager.playerData.LastMultiLocation);
+        areaUI.setLocationText(PlayerManager.playerData.LastMultiLocation);
     }
 
     public void updateLocation(ChangeMapFromServer changeMap)
     {
-        area.setLocationText(changeMap.MapName);
-        area.setConnectedMaps(changeMap.connectedName, changeMap.connectedID);
-        //updateObjects(changeMap.worldObjects);
+        if (changeMap != null) {
+            addEvent(new UpdateLocationEvent(this, areaUI, changeMap));
+            addEvent(new UpdateDataEvent(this));
+        }
     }
 
     public void updateObjects(ArrayList<SentWorldObject> sentWorldObjects)
     {
-        area.setWorldObjects(sentWorldObjects);
+        if (sentWorldObjects != null)
+            addEvent(new UpdateWorldObjectsEvent(this, areaUI, sentWorldObjects));
     }
 
     public void updateFriends(UpdateFriends updateFriends)
     {
         if (updateFriends != null)
-            socialUI.updateUsersFriendsList(updateFriends.FriendsList);
+            addEvent(new UpdateFriendsEvent(socialUI, updateFriends.FriendsList));
     }
 
     public void updateIgnore(UpdateIgnore updateIgnore)
@@ -109,18 +108,12 @@ public class MainScene extends Scene {
     public void updateParty(UpdateParty updateParty)
     {
         if (updateParty != null)
-            socialUI.updateUsersParty(updateParty.PartyList);
+            addEvent(new UpdateUserPartyEvent(socialUI, updateParty.PartyList));
     }
 
     @Override
     public void render(SpriteBatch batch) {
         try {
-            _CameraManager.render(batch);
-            if (_CameraManager.get_Camera() != null){
-                stage.getBatch().begin();
-
-                stage.getBatch().end();
-            }
             stage.act(Gdx.graphics.getDeltaTime());
             stage.draw();
         }
@@ -134,49 +127,23 @@ public class MainScene extends Scene {
 
     @Override
     public void update(float delta) {
-        //_InputManager.Update(delta);
         timer += delta;
+
         if (true)//(timer > StaticValues.updateFrequency)
         {
             UpdatePackageToServer updatePackageToServer = new UpdatePackageToServer();
 
+            Iterator<Event> eventIterator = updateEvents.iterator();
+            while (eventIterator.hasNext())
+            {
+                Event event = eventIterator.next();
+                event.eventUpdate(updatePackageToServer);
+                eventIterator.remove();
+            }
+
             //move dummy values to package object
             updatePackageToServer.inputsAsIntegers = updatePackageToServerDummy.inputsAsIntegers;
             updatePackageToServer.messages = chatWindow.getToBeSent();
-
-            if (updatePackageToServerDummy.newMapId != -1) {
-                ChangeMapFromClient changeMapFromClient = new ChangeMapFromClient();
-                changeMapFromClient.mapID = updatePackageToServerDummy.newMapId;
-                updatePackageToServer.changeMapFromClient = changeMapFromClient;
-
-                updatePackageToServerDummy.resetMapID();
-            }
-
-            if (updatePackageToServerDummy.getInteractObjectType() != null)
-                updatePackageToServer.interactObjectRequest = updatePackageToServerDummy.getInteractObjectType();
-
-            String uniqueID = area.getAddUniqueID();
-            if (uniqueID != null)
-            {
-                updatePackageToServer.addUserRequest = new AddUserRequest();
-                updatePackageToServer.addUserRequest.UniqueUserID = uniqueID;
-            }
-            area.setAddUniqueID(null);
-
-            uniqueID = area.getIgnoreUniqueID();
-            if (uniqueID != null)
-            {
-                updatePackageToServer.ignoreUserRequest = new IgnoreUserRequest();
-                updatePackageToServer.ignoreUserRequest.uniqueID = uniqueID;
-            }
-
-            uniqueID = area.getInvitePartyUniqueID();
-            if (uniqueID != null)
-            {
-                updatePackageToServer.partyInviteRequest = new PartyInviteRequest();
-                updatePackageToServer.partyInviteRequest.UniqueID = uniqueID;
-            }
-
 
             //Send data
             _Client.sendTCP(updatePackageToServer);
@@ -184,7 +151,6 @@ public class MainScene extends Scene {
 
             //clear the current values in the dummy
             updatePackageToServerDummy.resetInputList();
-            updatePackageToServerDummy.setInteractObjectType(null);
 
             timer -= StaticValues.updateFrequency;
         }
@@ -194,37 +160,23 @@ public class MainScene extends Scene {
     @Override
     public void create(){
         table.setFillParent(true);
-        //Independent new functions
         stage.getActors().forEach(Actor::remove);
-        _MapManager = new MapManager();
+
+        //Independent new functions
         _CameraManager = new CameraManager();
         _InputManager = new InputManager();
 
         _CameraManager.create();
-        //group.addActor(new VisLabel(String.valueOf(PlayerManager.playerData.CurrentHealth)));
 
         rootWindow = new SplitWindow("User: " + PlayerManager.playerData.UserName, false);
         rootWindow.setFillParent(true);
         rootWindow.setResizeBorder(10);
         rootWindow.setResizable(true);
         rootWindow.setMovable(false);
-        //rootWindow.setFillParent(true);
 
         table.addActor(rootWindow);
 
         buildUI();
-        //table.add(new VisLabel(PlayerManager.playerData.UserName));
-
-        //Gdx.input.setInputProcessor(_InputManager);
-        //create functions
-        /*
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                //_MapManager.create("Maps/map.tmx");
-                //_CameraManager.create(_MapManager);
-            }
-        });*/
     }
 
     private void buildUI()
@@ -235,11 +187,10 @@ public class MainScene extends Scene {
 
     private void buildLeft()
     {
-        area = new AreaUI(true, stage);
+        areaUI = new AreaUI(true, stage, this);
         combat = new CombatUI(true);
-        SplitWindow leftSplit = new SplitWindow("", true, area, combat);
+        SplitWindow leftSplit = new SplitWindow("", true, areaUI, combat);
         rootWindow.getLeftTable().add(leftSplit).expand().fill();
-
     }
 
     private void buildRight()
@@ -256,8 +207,6 @@ public class MainScene extends Scene {
         ItemWindow = new VisTable();
         utilWindow.add(ItemWindow).expand().fill();
 
-        //buildInventoryUI();
-
         // CHAT
         chatWindow = new ChatUI("Chat");
         socialUI = new SocialUI();
@@ -269,12 +218,8 @@ public class MainScene extends Scene {
 
     public void addMessages(ChatMessages chatMessages)
     {
-        if (chatMessages == null)
-            return;
-
-        for (ChatMessage message : chatMessages.messages) {
-            chatWindow.appendMessage(message);
-        }
+        if (chatMessages != null)
+            addEvent(new MessageEvent(chatMessages, chatWindow));
     }
 
 
@@ -325,7 +270,7 @@ public class MainScene extends Scene {
 
     }
 
-    private void buildGearUI() {
+    public void buildGearUI() {
         int i = 0;
         for (EquipmentItem item : PlayerManager.playerData.Equipment) {
             ItemEnums.EquipmentType equipmentType = ItemEnums.EquipmentType.values()[i];
@@ -339,7 +284,7 @@ public class MainScene extends Scene {
         }
     }
 
-    private void buildInventoryUI()
+    public void buildInventoryUI()
     {
         int i = 0;
         for (Item item : PlayerManager.playerData.Inventory) {
@@ -367,26 +312,26 @@ public class MainScene extends Scene {
     }
 
     public void updateStatus(PlayerStatus playerStatus) {
-        if (playerStatus == null)
-        {
-            if (!rootWindow.isDefaultTitle())
-                rootWindow.resetDefaultTitle();
-            return;
-        }
-        String objectName = Item.ObjectNameToText(playerStatus.objectName);
-        switch (playerStatus.interactObjectType) {
-            case TREE:
-                rootWindow.updateTitle("Chopping: " + objectName);
-                break;
-            case ORE:
-                rootWindow.updateTitle("Mining: " + objectName);
-                break;
-        }
+        if (playerStatus != null)
+            addEvent(new UpdateStatusEvent(playerStatus, rootWindow));
     }
 
-    private enum TabType{
+    public void addEvent(Event event)
+    {
+        updateEvents.add(event);
+    }
+
+    public enum TabType{
         STATS,
         INVENTORY,
         GEAR
+    }
+
+    public TabType getCurrentTabType() {
+        return currentTabType;
+    }
+
+    public VisTable getItemWindow() {
+        return ItemWindow;
     }
 }

@@ -9,8 +9,8 @@ import java.util.Collection;
 
 public class OtherUsersEvent implements UserEvent {
 
-    private Collection<UserIdentity> userIdentities;
-    private UserIdentity reciever;
+    private final Collection<UserIdentity> userIdentities;
+    private final UserIdentity reciever;
 
     public OtherUsersEvent(Collection<UserIdentity> userIdentities, UserIdentity userIdentity)
     {

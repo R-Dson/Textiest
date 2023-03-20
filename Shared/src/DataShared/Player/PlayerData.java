@@ -4,6 +4,8 @@ import DataShared.Item.EquipmentItem;
 import DataShared.Item.Item;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.HashSet;
+
 public class PlayerData {
     //Information
     public String UniqueConnectID;
@@ -15,6 +17,7 @@ public class PlayerData {
     public String LocationID;
     public String targetName;
     public boolean isChanneling = false;
+    public HashSet<String> friendsUniqueIDs;
 
     //Data
     public int MaxHealth = -1;

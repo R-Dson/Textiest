@@ -1,5 +1,6 @@
 package Managers.Networking;
 
+import Data.Events.received.UpdateOtherUsersEvent;
 import DataShared.Network.NetworkMessages.*;
 import DataShared.Network.NetworkMessages.Client.ConnectionEstablished;
 import DataShared.Network.NetworkMessages.Client.CreationRequest;
@@ -148,15 +149,16 @@ public class GameClient {
                 if (Textiest.CurrentScene instanceof MainScene)
                 {
                     MainScene ms = (MainScene) Textiest.CurrentScene;
-
                     UpdatePackage pkg = (UpdatePackage) obj;
+
                     if (pkg.receiverData != null) {
                         PlayerManager.playerData = pkg.receiverData;
                         ms.updateData();
                     }
-                    OtherPlayerManager.OtherPlayerData = pkg.otherPlayers;
+                    //OtherPlayerManager.OtherPlayerData = pkg.otherPlayers;
 
-                    ms.updateUsers(OtherPlayerManager.OtherPlayerData);
+                    ms.updateUsers(pkg.otherPlayers);
+
                     ms.addMessages(pkg.newMessages);
                     ms.updateStatus(pkg.playerStatus);
                     ms.updateFriends(pkg.updateFriends);

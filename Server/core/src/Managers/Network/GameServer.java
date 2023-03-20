@@ -21,6 +21,7 @@ import com.vaniljstudio.server.ServerClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -302,14 +303,24 @@ public class GameServer {
                 UserIdentity next = iterator.next();
                 String data = SQLManager.requestData(next.UserName);
                 next.playerData = json.fromJson(PlayerData.class, data);
-                if (next.playerData.UniqueUserID == null)
-                    next.playerData.UniqueUserID = UUID.randomUUID().toString();
+
+                checkForNulls(next.playerData);
+
                 Managers.EntityManager.EntityList.put(next.connectionID, next);
                 MapManager.AssignLogin(next);
 
                 iterator.remove();
             }
         }
+    }
+
+    private void checkForNulls(PlayerData playerData)
+    {
+        if (playerData.UniqueUserID == null)
+            playerData.UniqueUserID = UUID.randomUUID().toString();
+
+        if (playerData.friendsUniqueIDs == null)
+            playerData.friendsUniqueIDs = new HashSet<>();
     }
 
     private void UpdateRecieved(float delta){

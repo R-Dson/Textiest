@@ -25,7 +25,6 @@ public class UserIdentity extends Entity {
     public MapLayer currentLayer;
     public Map currentMap;
     public String UserName;
-    public HashSet<String> friendsUniqueIDs;
     public ArrayList<String> ignoreUniqueIDs;
     private Party party;
     private float timer = 0;
@@ -38,7 +37,6 @@ public class UserIdentity extends Entity {
         this.UniqueID = UniqueID;
         this.connectionID = connectionID;
         newMessages = new ArrayList<>();
-        friendsUniqueIDs = new HashSet<>();
         ignoreUniqueIDs = new ArrayList<>();
         updateEvents = new LinkedHashSet<>();
     }
@@ -97,7 +95,7 @@ public class UserIdentity extends Entity {
 
     public void sendUpdateFriends()
     {
-        updateEvents.add(new FriendsEvent(friendsUniqueIDs));
+        updateEvents.add(new FriendsEvent(playerData.friendsUniqueIDs));
     }
 
     public void sendUpdateIgnore()
@@ -164,7 +162,7 @@ public class UserIdentity extends Entity {
     public void addFriend(String uniqueID)
     {
         Gdx.app.log("STATUS", "Attempting to add friend.");
-        if (!friendsUniqueIDs.add(uniqueID))
+        if (!playerData.friendsUniqueIDs.add(uniqueID))
             return;
         sendUpdateFriends();
         Gdx.app.log("STATUS", "Added friend.");
@@ -172,7 +170,7 @@ public class UserIdentity extends Entity {
 
     public void removeFriend(String uniqueID)
     {
-        friendsUniqueIDs.remove(uniqueID);
+        playerData.friendsUniqueIDs.remove(uniqueID);
         sendUpdateFriends();
     }
 

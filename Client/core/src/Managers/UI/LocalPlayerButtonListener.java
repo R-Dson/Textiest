@@ -1,9 +1,12 @@
 package Managers.UI;
 
+import Data.Events.Send.AddUserEvent;
+import Data.Events.Send.IgnoreUserEvent;
+import Data.Events.Send.InvitePartyUniqueIDEvent;
+import Managers.Scenes.MainScene;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.kotcrab.vis.ui.util.dialog.ConfirmDialogListener;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 
 public class LocalPlayerButtonListener extends ChangeListener {
@@ -13,17 +16,17 @@ public class LocalPlayerButtonListener extends ChangeListener {
     private final int Ignore = 4;
     private final int Close = 5;
 
-    private String UniqueID;
-    private String Name;
-    private Stage stage;
-    private AreaUI areaUI;
+    private final String UniqueID;
+    private final String Name;
+    private final Stage stage;
+    private final  MainScene mainScene;
 
-    public LocalPlayerButtonListener(String Name, String UniqueID, Stage stage, AreaUI areaUI)
+    public LocalPlayerButtonListener(String Name, String UniqueID, MainScene mainScene, Stage stage)
     {
         this.Name = Name;
         this.UniqueID = UniqueID;
         this.stage = stage;
-        this.areaUI = areaUI;
+        this.mainScene = mainScene;
     }
 
     @Override
@@ -39,11 +42,11 @@ public class LocalPlayerButtonListener extends ChangeListener {
                         case Whisper:
                             // Whisper
                         case Invite:
-                            areaUI.setInvitePartyUniqueID(UniqueID);
+                            mainScene.addEvent(new InvitePartyUniqueIDEvent(UniqueID));
                         case AddFriend:
-                            areaUI.setAddUniqueID(UniqueID);
+                            mainScene.addEvent(new AddUserEvent(UniqueID));
                         case Ignore:
-                            areaUI.setIgnoreUniqueID(UniqueID);
+                            mainScene.addEvent(new IgnoreUserEvent(UniqueID));
 
                     }
                 });

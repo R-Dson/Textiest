@@ -16,6 +16,7 @@ import com.esotericsoftware.kryo.Kryo;
 import DataShared.Network.NetworkMessages.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
 public class NetworkManager {
     public static void Register (Kryo kryo){
@@ -67,5 +68,6 @@ public class NetworkManager {
         kryo.register(AddUserRequest.class);
         kryo.register(PartyInviteRequest.class);
         kryo.register(IgnoreUserRequest.class);
+        kryo.register(HashSet.class);
     }
 }
