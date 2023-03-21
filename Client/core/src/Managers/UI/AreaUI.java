@@ -21,15 +21,11 @@ public class AreaUI extends VisTable {
     private final VisTable connectedMapsTable;
     private final VisTable worldObjectsTable;
     private final VisTable enemiesTable;
-    private final Stage stage;
-    private final MainScene mainScene;
     VisScrollPane userPanel;
 
-    public AreaUI(boolean vertical, Stage stage, MainScene mainScene)
+    public AreaUI(boolean vertical)
     {
         super(vertical);
-        this.stage = stage;
-        this.mainScene = mainScene;
 
         locationText = new VisLabel();
         worldObjectsTable = new VisTable();
@@ -68,5 +64,9 @@ public class AreaUI extends VisTable {
 
     public VisTable getUsersTable() {
         return usersTable;
+    }
+
+    public VisTable getEnemiesTable() {
+        return enemiesTable;
     }
 }

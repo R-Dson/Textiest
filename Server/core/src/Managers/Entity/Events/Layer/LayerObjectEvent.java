@@ -11,9 +11,9 @@ import java.util.HashMap;
 public class LayerObjectEvent implements LayerEvent {
 
     private final Collection<UserIdentity> identities;
-    private final ArrayList<WorldObject> objects;
+    private final Collection<WorldObject> objects;
 
-    public LayerObjectEvent(Collection<UserIdentity> identities, ArrayList<WorldObject> objects)
+    public LayerObjectEvent(Collection<UserIdentity> identities, Collection<WorldObject> objects)
     {
         this.identities = identities;
         this.objects = objects;

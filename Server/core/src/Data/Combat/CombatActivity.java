@@ -3,7 +3,7 @@ package Data.Combat;
 import Data.NPC;
 import Managers.Network.UserIdentity;
 
-public class Combat {
+public class CombatActivity {
 
     private float timerPlayer = 0;
     private float timerNPC = 0;
@@ -11,7 +11,7 @@ public class Combat {
     private UserIdentity player;
     private NPC npc;
 
-    public Combat(UserIdentity player, NPC npc)
+    public CombatActivity(UserIdentity player, NPC npc)
     {
         this.player = player;
         this.npc = npc;
@@ -20,7 +20,7 @@ public class Combat {
     public void Update(float delta)
     {
         timerNPC += delta;
-        timerNPC += delta;
+        timerPlayer += delta;
 
         // TODO: GET ATTACK TIME
 

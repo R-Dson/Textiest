@@ -162,6 +162,7 @@ public class GameClient {
                     ms.updateFriends(pkg.updateFriends);
                     ms.updateIgnore(pkg.updateIgnore);
                     ms.updateLocation(pkg.changeMapFromServer);
+                    ms.updateNPCs(pkg.updateNPCs);
 
                     if (pkg.updateObjects != null)
                         ms.updateObjects(pkg.updateObjects.sentWorldObjects);

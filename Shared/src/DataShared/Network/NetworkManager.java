@@ -7,6 +7,7 @@ import DataShared.Item.ItemEnums;
 import DataShared.Item.Material;
 import DataShared.MapType;
 import DataShared.Network.NetworkMessages.Client.*;
+import DataShared.Network.NetworkMessages.Client.Chat.InteractWithNPC;
 import DataShared.Network.NetworkMessages.Client.Chat.SendMessage;
 import DataShared.Network.NetworkMessages.Server.*;
 import DataShared.Network.NetworkMessages.ErrorEnum;
@@ -69,5 +70,6 @@ public class NetworkManager {
         kryo.register(PartyInviteRequest.class);
         kryo.register(IgnoreUserRequest.class);
         kryo.register(HashSet.class);
+        kryo.register(InteractWithNPC.class);
     }
 }

@@ -1,6 +1,7 @@
 package DataShared.Network;
 
 import DataShared.Network.NetworkMessages.Client.*;
+import DataShared.Network.NetworkMessages.Client.Chat.InteractWithNPC;
 import DataShared.Network.NetworkMessages.Client.Chat.SendMessage;
 
 import java.util.ArrayList;
@@ -14,4 +15,5 @@ public class UpdatePackageToServer {
     public PartyInviteRequest partyInviteRequest;
     public AddUserRequest addUserRequest;
     public IgnoreUserRequest ignoreUserRequest;
+    public InteractWithNPC interactWithNPC;
 }

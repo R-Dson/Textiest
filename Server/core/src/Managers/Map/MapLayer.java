@@ -1,6 +1,8 @@
 package Managers.Map;
 
+import Data.Combat.CombatActivity;
 import Data.FixedValues;
+import Data.NPC;
 import Data.Objects.ObjectActivity;
 import Data.Objects.Ore;
 import Data.Objects.Tree;
@@ -28,8 +30,11 @@ public class MapLayer {
     private boolean updatedObjects;
 
     private final LinkedHashSet<LayerEvent> events;
-    private final ArrayList<WorldObject> layerObjects;
-    private final ArrayList<ObjectActivity> objectActivities;
+    private final HashMap<Integer, WorldObject> layerObjects;
+    private final HashMap<Integer, NPC> integerNPCHashMap;
+
+    private final HashMap<Object, ArrayList<ObjectActivity>> objectActivities;
+    private final HashMap<NPC, CombatActivity> encounters;
 
     public MapLayer(Map map, String MapName, long LayerID, String CreatorID){
         this.MapName = MapName;
@@ -38,9 +43,11 @@ public class MapLayer {
         this.map = map;
 
         chatManager = new ChatManager();
-        layerObjects = new ArrayList<>();
-        objectActivities = new ArrayList<>();
+        layerObjects = new HashMap<>();
+        objectActivities = new HashMap<>();
         events = new LinkedHashSet<>();
+        encounters = new HashMap<>();
+        integerNPCHashMap = new HashMap<>();
         updatedObjects = false;
 
         generateLayerObjects();
@@ -60,7 +67,8 @@ public class MapLayer {
 
         updatedObjects = false;
 
-        objectActivities.forEach(o -> o.Update(delta));
+        objectActivities.values().forEach(o -> o.forEach(objectActivity -> objectActivity.Update(delta)));
+        //.forEach(o -> o.Update(delta));
 
         while (timer >= FixedValues.UpdateFrequency5){
 
@@ -75,7 +83,7 @@ public class MapLayer {
 
             //chatManager.addMessagesToUsers(users.values());
 
-            layerObjects.forEach(lo -> lo.Update(delta));
+            layerObjects.values().forEach(lo -> lo.Update(delta));
 
 
             // always last
@@ -112,12 +120,12 @@ public class MapLayer {
                 case TREE:
                     Tree tree = new Tree(this, i, 1000, 1, 5);
                     tree.initTree(map.TreeTypes);
-                    layerObjects.add(tree);
+                    layerObjects.put(i, tree);
                     break;
                 case ROCK:
                     Ore rock = new Ore(this, i, 1000, 1, 5);
                     rock.initOre(map.OreTypes);
-                    layerObjects.add(rock);
+                    layerObjects.put(i, rock);
                     break;
             }
 
@@ -129,11 +137,6 @@ public class MapLayer {
         objectActivities.remove(objectActivity);
     }
 
-    /*public void setUpdatedObjects(boolean updatedObjects)
-    {
-        this.updatedObjects = updatedObjects;
-    }*/
-
     public void BeginInteractWithObject(UserIdentity userIdentity, int objectID)
     {
         WorldObject object = getObjectByID(objectID);
@@ -141,17 +144,20 @@ public class MapLayer {
         if (object == null)
             return;
 
-        objectActivities.add(new ObjectActivity(object, userIdentity));
+        if (objectActivities.get(object) == null)
+            objectActivities.put(object, new ArrayList<>());
+
+        objectActivities.get(object).add(new ObjectActivity(object, userIdentity));
     }
 
     public void sendObjectLayerUpdate()
     {
-        events.add(new LayerObjectEvent(users.values(), layerObjects));
+        addLayerEvent(new LayerObjectEvent(users.values(), layerObjects.values()));
     }
 
     public WorldObject getObjectByID(int objectID)
     {
-        return layerObjects.stream().filter(lo -> lo.getObjectID() == objectID).findFirst().get();
+        return layerObjects.get(objectID);
     }
 
     public boolean getUpdatedObjects()
@@ -159,16 +165,17 @@ public class MapLayer {
         return updatedObjects;
     }
 
-    public void addLayerEvent(LayerEvent event)
+
+    public void removeCombatActivity(CombatActivity combatActivity)
     {
-        events.add(event);
+
     }
 
     public void addChatMessage(SendMessage message, UserIdentity userIdentity)
     {
         ChatMessage cm = new ChatMessage(message.Message, userIdentity, message.chatEnum);
         chatManager.appendChatMessage(cm);
-        events.add(new LayerMessageEvent(chatManager, users.values()));
+        addLayerEvent(new LayerMessageEvent(chatManager, users.values()));
     }
 
     public void AddUserToLayer(UserIdentity userIdentity){
@@ -189,9 +196,16 @@ public class MapLayer {
         RemoveUserFromLayerID(userIdentity.connectionID);
     }
 
-    public ArrayList<WorldObject> getLayerObjects() {
-        return layerObjects;
+    public Collection<WorldObject> getLayerObjects() {
+        return layerObjects.values();
     }
+
+
+    public void addLayerEvent(LayerEvent event)
+    {
+        events.add(event);
+    }
+
 
     /*
         public void SetupMapCollision(){

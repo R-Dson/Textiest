@@ -1,6 +1,7 @@
 package Data.Events.received;
 
 import Data.Events.Event;
+import Data.Events.Send.ChangeMapEvent;
 import DataShared.Network.NetworkMessages.Server.ChangeMapFromServer;
 import DataShared.Network.UpdatePackageToServer;
 import Managers.Scenes.MainScene;

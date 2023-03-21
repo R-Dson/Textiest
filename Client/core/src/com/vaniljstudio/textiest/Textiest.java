@@ -60,9 +60,10 @@ public class Textiest extends ApplicationAdapter {
 		//Begin then send batch to every sub function
 		batch.begin();
 		//render scene
+		if (CurrentScene != null)
+			CurrentScene.render(batch);
 		try {
-			if (CurrentScene != null)
-				CurrentScene.render(batch);
+
 		}
 		catch (IllegalStateException | NullPointerException e)
 		{

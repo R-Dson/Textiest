@@ -12,6 +12,7 @@ import DataShared.Player.PlayerData;
 import Managers.*;
 import Managers.Map.Map;
 import Managers.Map.MapManager;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
@@ -120,7 +121,7 @@ public class GameServer {
                 }
                 catch (NullPointerException e)
                 {
-
+                    Gdx.app.log("ERROR", "Failed to add message.");
                 }
 
                 InteractObjectRequest ior = updatePackageToServer.interactObjectRequest;
@@ -131,8 +132,12 @@ public class GameServer {
 
                 if (updatePackageToServer.addUserRequest != null)
                     ui.addFriend(updatePackageToServer.addUserRequest.UniqueUserID);
+
                 if (updatePackageToServer.ignoreUserRequest != null)
                     ui.addIgnore(updatePackageToServer.ignoreUserRequest.uniqueID);
+
+                if (updatePackageToServer.interactWithNPC != null)
+                    ui.initCombat(updatePackageToServer.interactWithNPC.NPCID);
 
                 if (updatePackageToServer.changeMapFromClient != null)
                 {

@@ -11,7 +11,9 @@ public class UpdatePackage {
     public ChangeMapFromServer changeMapFromServer;
     public PlayerStatus playerStatus;
     public UpdateObjects updateObjects;
+    public UpdateNPCs updateNPCs;
     public UpdateParty updateParty;
     public UpdateFriends updateFriends;
     public UpdateIgnore updateIgnore;
+    public UpdateCombat updateCombat;
 }

@@ -1,4 +1,4 @@
-package Data.Events.received;
+package Data.Events.Send;
 
 import Data.Events.Event;
 import DataShared.Network.NetworkMessages.Client.InteractObjectRequest;

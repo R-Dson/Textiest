@@ -87,6 +87,13 @@ public class MainScene extends Scene {
         }
     }
 
+    public void updateNPCs(UpdateNPCs updateNPCs)
+    {
+        if (updateNPCs != null)
+            addEvent(new UpdateNearbyNPCsEvent(this, areaUI, updateNPCs));
+
+    }
+
     public void updateObjects(ArrayList<SentWorldObject> sentWorldObjects)
     {
         if (sentWorldObjects != null)
@@ -113,9 +120,10 @@ public class MainScene extends Scene {
 
     @Override
     public void render(SpriteBatch batch) {
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
         try {
-            stage.act(Gdx.graphics.getDeltaTime());
-            stage.draw();
+
         }
         catch (IllegalStateException | NullPointerException | ArrayIndexOutOfBoundsException e)
         {
@@ -129,7 +137,7 @@ public class MainScene extends Scene {
     public void update(float delta) {
         timer += delta;
 
-        if (true)//(timer > StaticValues.updateFrequency)
+        if (timer > StaticValues.updateFrequency)
         {
             UpdatePackageToServer updatePackageToServer = new UpdatePackageToServer();
 
@@ -187,7 +195,7 @@ public class MainScene extends Scene {
 
     private void buildLeft()
     {
-        areaUI = new AreaUI(true, stage, this);
+        areaUI = new AreaUI(true);
         combat = new CombatUI(true);
         SplitWindow leftSplit = new SplitWindow("", true, areaUI, combat);
         rootWindow.getLeftTable().add(leftSplit).expand().fill();

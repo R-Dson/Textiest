@@ -7,6 +7,7 @@ import Data.Party;
 import DataShared.Network.NetworkMessages.Server.*;
 import DataShared.Player.PlayerData;
 import Managers.Chat.ChatMessage;
+import Managers.Entity.Events.Layer.CombatInitEvent;
 import Managers.Entity.Events.User.*;
 import Managers.Entity.UserEvent;
 import Managers.Map.Map;
@@ -16,7 +17,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.vaniljstudio.server.ServerClass;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Iterator;
+import java.util.Collection;
 
 public class UserIdentity extends Entity {
     public String UniqueID;
@@ -69,6 +73,11 @@ public class UserIdentity extends Entity {
 
     }
 
+    public void initCombat(int id)
+    {
+        currentLayer.addLayerEvent(new CombatInitEvent(id, this));
+    }
+
     public void RemoveUserIdentityFromLayer(){
         currentLayer.RemoveUserFromLayer(this);
     }
@@ -78,46 +87,46 @@ public class UserIdentity extends Entity {
 
     public void sendUpdateDataSignal()
     {
-        updateEvents.add(new UserUpdateEvent(playerData));
+        addEvent(new UserUpdateEvent(playerData));
     }
 
     public void addPlayerMessages(ArrayList<ChatMessage> newMessages)
     {
         this.newMessages.addAll(newMessages);
-        updateEvents.add(new MessageEvent(this.newMessages));
+        addEvent(new MessageEvent(this.newMessages));
         this.newMessages.clear();
     }
 
-    public void sendObjectSignal(ArrayList<WorldObject> worldObjects)
+    public void sendObjectSignal(Collection<WorldObject> worldObjects)
     {
-        updateEvents.add(new ObjectEvent(worldObjects));
+        addEvent(new ObjectEvent(worldObjects));
     }
 
     public void sendUpdateFriends()
     {
-        updateEvents.add(new FriendsEvent(playerData.friendsUniqueIDs));
+        addEvent(new FriendsEvent(playerData.friendsUniqueIDs));
     }
 
     public void sendUpdateIgnore()
     {
-        updateEvents.add(new IgnoreEvent(ignoreUniqueIDs));
+        addEvent(new IgnoreEvent(ignoreUniqueIDs));
     }
 
     // ZONE
 
     public void sendChangeMap()
     {
-        updateEvents.add(new ChangeMapEvent(currentMap));
+        addEvent(new ChangeMapEvent(currentMap));
         currentLayer.sendObjectLayerUpdate();
     }
 
     public void setObjectActivity(ObjectActivity objectActivity) {
-        updateEvents.add(new PlayerStatusEvent(objectActivity));
+        addEvent(new PlayerStatusEvent(objectActivity));
     }
 
     public void sendNearbyPlayerChange(Collection<UserIdentity> userIdentities)
     {
-        updateEvents.add(new OtherUsersEvent(userIdentities, this));
+        addEvent(new OtherUsersEvent(userIdentities, this));
     }
 
     // PARTY
@@ -137,9 +146,9 @@ public class UserIdentity extends Entity {
     public void sendUpdateParty()
     {
         if (party != null)
-            updateEvents.add(new PartyEvent(party.getUserNames()));
+            addEvent(new PartyEvent(party.getUserNames()));
         else
-            updateEvents.add(new PartyEvent(null));
+            addEvent(new PartyEvent(null));
 
     }
 
@@ -172,6 +181,11 @@ public class UserIdentity extends Entity {
     {
         playerData.friendsUniqueIDs.remove(uniqueID);
         sendUpdateFriends();
+    }
+
+    public void addEvent(UserEvent event)
+    {
+        updateEvents.add(event);
     }
 
     @Override

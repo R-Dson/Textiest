@@ -1,9 +1,9 @@
 package Data.Events.received;
 
 import Data.Events.Event;
-import Data.Events.Send.InteractObjectEvent;
-import DataShared.Item.Item;
-import DataShared.Network.NetworkMessages.Server.SentWorldObject;
+import Data.Events.Send.InteractNPCEvent;
+import DataShared.Network.NetworkMessages.Server.NPCDetails;
+import DataShared.Network.NetworkMessages.Server.UpdateNPCs;
 import DataShared.Network.UpdatePackageToServer;
 import Managers.Scenes.MainScene;
 import Managers.UI.AreaUI;
@@ -15,29 +15,27 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisScrollPane;
 import com.kotcrab.vis.ui.widget.VisTable;
 
-import java.util.ArrayList;
-
-public class UpdateWorldObjectsEvent implements Event {
-    private final AreaUI areaUI;
-    private final ArrayList<SentWorldObject> sentWorldObjects;
+public class UpdateNearbyNPCsEvent implements Event {
+    private final UpdateNPCs updateNPCs;
     private final MainScene mainScene;
-    public UpdateWorldObjectsEvent(MainScene mainScene, AreaUI areaUI, ArrayList<SentWorldObject> sentWorldObjects)
+    private final AreaUI areaUI;
+
+    public UpdateNearbyNPCsEvent(MainScene mainScene, AreaUI areaUI, UpdateNPCs updateNPCs)
     {
         this.mainScene = mainScene;
+        this.updateNPCs = updateNPCs;
         this.areaUI = areaUI;
-        this.sentWorldObjects = sentWorldObjects;
     }
 
     @Override
     public void eventUpdate(UpdatePackageToServer updatePackageToServer) {
-
         VerticalGroup group = new VerticalGroup();
-        for (SentWorldObject worldObject : sentWorldObjects) {
-            String name = Item.ObjectNameToText(worldObject.objectName);
+        for (NPCDetails npc : updateNPCs.npcList) {
 
-            IDTextButton btn = new IDTextButton(name);
-            btn.setId(worldObject.objectID);
-            btn.setDisabled(!worldObject.isUsable);
+
+            IDTextButton btn = new IDTextButton(npc.NPCName);
+            btn.setId(npc.NPCID);
+            btn.setDisabled(!npc.isUsable);
 
             ChangeListener object_listener = new ChangeListener(){
                 @Override
@@ -46,7 +44,8 @@ public class UpdateWorldObjectsEvent implements Event {
                     {
                         IDTextButton btn = (IDTextButton)actor;
                         int objectID = btn.getId();
-                        mainScene.addEvent(new InteractObjectEvent(objectID));
+                        // TODO: Add options
+                        mainScene.addEvent(new InteractNPCEvent(objectID));
                     }
                 }
             };
@@ -54,12 +53,15 @@ public class UpdateWorldObjectsEvent implements Event {
 
             group.addActor(btn);
         }
-        VisTable worldObjectsTable = areaUI.getWorldObjectsTable();
-        worldObjectsTable.clear();
-        worldObjectsTable.add(new VisLabel("Objects")).center();
-        worldObjectsTable.row();
+
+        VisTable enemiesTable = areaUI.getEnemiesTable();
+        enemiesTable.clear();
+        // TODO: Filter enemies from friendly npcs
+        // TODO: Get info about npc from files
+        enemiesTable.add(new VisLabel("NPCs")).center();
+        enemiesTable.row();
         VisScrollPane vs = new VisScrollPane(group);
         vs.setFadeScrollBars(false);
-        worldObjectsTable.add(vs).fill().expand();
+        enemiesTable.add(vs).fill().expand();
     }
 }

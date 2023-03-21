@@ -7,12 +7,13 @@ import DataShared.Network.NetworkMessages.Server.UpdatePackage;
 import Managers.Entity.UserEvent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ObjectEvent implements UserEvent {
 
-    private final ArrayList<WorldObject> worldObjects;
+    private final Collection<WorldObject> worldObjects;
 
-    public ObjectEvent(ArrayList<WorldObject> worldObjects)
+    public ObjectEvent(Collection<WorldObject> worldObjects)
     {
         this.worldObjects = worldObjects;
     }
