@@ -69,7 +69,7 @@ public class Ore extends WorldObject{
         super.activity(userIdentity, objectActivity);
 
         try{
-            Item item = ServerClass.ItemManager.getItemFromList(this);
+            Item item = ServerClass.getController().getItemManager().getItemFromList(this);
 
             numberOfStonesLeft--;
             PlayerManager.AddItemToInventory(userIdentity, item);

@@ -15,12 +15,16 @@ import DataShared.Player.PlayerData;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import DataShared.Network.NetworkMessages.*;
+import com.esotericsoftware.kryonet.EndPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
 public class NetworkManager {
-    public static void Register (Kryo kryo){
+    public static void Register (final Kryo kryo){
+        //final Kryo kryo = endPoint.getKryo();
+        kryo.register(NetworkPackage.class);
         kryo.register(ConnectionEstablished.class);
         kryo.register(LoginRequest.class);
         kryo.register(LoginError.class);

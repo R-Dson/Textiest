@@ -1,6 +1,7 @@
 package Managers.Scenes;
 
 import Managers.CameraManager;
+import Managers.Managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -10,32 +11,30 @@ import com.vaniljstudio.textiest.Textiest;
 
 public class ConnectionScene extends Scene{
     public VisLabel userLabel;
-    private CameraManager _CameraManager;
+    Managers managers;
 
-    public ConnectionScene()
+    public ConnectionScene(Managers managers)
     {
         super();
-        ExtendViewport viewport = new ExtendViewport((int)_CameraManager.get_Camera().viewportWidth, (int)_CameraManager.get_Camera().viewportHeight);
+        this.managers = managers;
+
+        CameraManager cameraManager = managers.getCameraManager();
+        ExtendViewport viewport = new ExtendViewport((int)cameraManager.get_Camera().viewportWidth, (int)cameraManager.get_Camera().viewportHeight);
         stage.setViewport(viewport);
-        stage.getViewport().update((int)_CameraManager.get_Camera().viewportWidth, (int)_CameraManager.get_Camera().viewportHeight, true);
+        stage.getViewport().update((int)cameraManager.get_Camera().viewportWidth, (int)cameraManager.get_Camera().viewportHeight, true);
 
     }
 
     @Override
     public void create() {
-        _CameraManager = new CameraManager();
-        _CameraManager.create();
+        managers.setCameraManager(new CameraManager());
+        managers.getCameraManager().create();
+
         userLabel = new VisLabel("Connecting...");
         table.add(userLabel);
         table.setDebug(true);
 
-        CheckConnection();
-    }
-
-    private boolean CheckConnection(){
-        if (Textiest.GameClient.getClient() == null) return false;
-        if (Textiest.GameClient.getClient().isConnected()) return true;
-        return Textiest.GameClient.AttemptConnection();
+        managers.getNetworkManager().CheckConnection();
     }
 
     @Override

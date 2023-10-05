@@ -2,7 +2,9 @@ package com.vaniljstudio.textiest;
 
 import Data.StaticValues;
 import Managers.DataManager;
+import Managers.Managers;
 import Managers.Networking.GameClient;
+import Managers.Networking.NetworkManager;
 import Managers.Scenes.ConnectionScene;
 import Managers.Scenes.MainScene;
 import Managers.Scenes.Scene;
@@ -16,25 +18,20 @@ public class Textiest extends ApplicationAdapter {
 	SpriteBatch batch;
 	private float timer60;
 
-	public static GameClient GameClient;
-	public static DataManager DataManager;
-
 	public static String uniqueConnectID;
 	public static Scene CurrentScene;
 	public static float INIT_WIDTH, INIT_HEIGHT;
+
+	public static Managers managers;
 	
 	@Override
 	public void create () {
 		//Initiate functions
-		GameClient = new GameClient();
-
 		batch = new SpriteBatch();
-		DataManager = new DataManager();
+		managers = new Managers();
 
-		//Starts the client
-		GameClient.StartClient();
 
-		CurrentScene = new ConnectionScene();
+		CurrentScene = new ConnectionScene(managers);
 	}
 
 	@Override
@@ -44,7 +41,7 @@ public class Textiest extends ApplicationAdapter {
 
 		//Update client
 		if (CurrentScene instanceof MainScene)
-			GameClient.Update(delta);
+			managers.getNetworkManager().Update(delta);
 
 		//Updates the scene on a fixed value
 		while (timer60 >= StaticValues.updateFrequency){

@@ -6,6 +6,8 @@ import DataShared.Network.NetworkMessages.Client.ConnectionEstablished;
 import DataShared.Network.NetworkMessages.Client.CreationRequest;
 import DataShared.Network.NetworkMessages.Client.LoginRequest;
 import DataShared.Network.NetworkMessages.Server.*;
+import DataShared.Network.UpdatePackageToServer;
+import Managers.ClientListener;
 import Managers.OtherPlayerManager;
 import Managers.PlayerManager;
 import Managers.Scenes.ConnectionScene;
@@ -13,6 +15,7 @@ import Managers.Scenes.LoginScene;
 import Managers.Scenes.MainScene;
 import Managers.Scenes.SceneChangeRunnable;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -21,57 +24,43 @@ import com.esotericsoftware.kryonet.Listener;
 import com.vaniljstudio.textiest.Textiest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class GameClient {
-    
-    private Client client;
-    private Kryo kryo;
+public class GameClient extends Client{
+    private final Json json = new Json();
 
-    public static boolean ConnectedToServer = false;
+    public GameClient()
+    {
+        super();
+        SetupClient();
+    }
 
+    public void SetupClient() {
+        // Starting
+        this.start();
 
-    public void StartClient() {
+        // Register
+        DataShared.Network.NetworkManager.Register(this.getKryo());
 
-        InitClient();
-        Register();
-
+        // Listeners
         AddListeners();
 
         //send confirmation after
-        this.client.sendTCP(new ConnectionEstablished());
+        SendTCP(ConnectionEstablished.class.getName(), new ConnectionEstablished());
     }
 
-    private void Register(){
-        kryo = client.getKryo();
-        DataShared.Network.NetworkManager.Register(kryo);
-    }
-
-    private void InitClient(){
-        client = new Client();
-        client.start();
-
-    }
-
-    private float AttemptTimer = 0;
-    private float UpdateTimer = 0;
-
-    public void Update(float delta){
-        UpdateTimer += delta;
-        if (UpdateTimer > 1/20f){
-            //TODO: add reconnect then disconnect completely
-            if (!client.isConnected())
-            {
-                client.close();
-                Textiest.CurrentScene = new LoginScene();
-            }
-            UpdateTimer -= 1/20f;
-        }
+    public void SendTCP(String fName, Object params)
+    {
+        NetworkPackage np = new NetworkPackage();
+        np.fName = fName;
+        np.jsonParameters = json.toJson(params);
+        this.sendTCP(np);
     }
 
     public static int ConnectionAttempts = 0;
 
     public boolean AttemptConnection(){
-
+        Client client = this;
         Timer.Task task = new Timer.Task(){
             boolean connected = false;
             @Override
@@ -83,6 +72,7 @@ public class GameClient {
                     ConnectionAttempts++;
                     Gdx.app.log("NETWORK_ERROR", "Attempting to connect! Total attempts: " + ConnectionAttempts);
                     connected = Connect();
+
                     if (!connected && ConnectionAttempts > 3){
                         if(Textiest.CurrentScene instanceof ConnectionScene)
                             ((ConnectionScene) Textiest.CurrentScene).userLabel.setText("Failed Connecting.");
@@ -107,10 +97,10 @@ public class GameClient {
 
     private boolean Connect(){
         try{
-            client.connect(5000, "localhost", 54555);
+            this.connect(5000, "localhost", 54555);
             ConnectionEstablished connectionEstablished = new ConnectionEstablished();
             connectionEstablished.UniqueConnectID = "Connected";
-            client.sendTCP(connectionEstablished);
+            SendTCP(ConnectionEstablished.class.getName(), connectionEstablished);
             return true;
         }
         catch (IOException e)
@@ -121,97 +111,6 @@ public class GameClient {
     }
 
     private void AddListeners(){
-        this.client.addListener(new ClientListener());
-    }
-
-    class ClientListener implements Listener {
-        @Override
-        public void connected(Connection connection) {
-            ConnectedToServer = true;
-        }
-
-        @Override
-        public void disconnected(Connection connection) {
-            ConnectedToServer = false;
-        }
-
-        @Override
-        public void received(Connection connection, Object obj) {
-
-            if (obj instanceof ConnectionEstablished){
-                SetUpID((ConnectionEstablished) obj);
-            }
-            else if (obj instanceof LoginError){
-                loginError(connection, obj);
-            }
-            else if (obj instanceof UpdatePackage)
-            {
-                if (Textiest.CurrentScene instanceof MainScene)
-                {
-                    MainScene ms = (MainScene) Textiest.CurrentScene;
-                    UpdatePackage pkg = (UpdatePackage) obj;
-
-                    if (pkg.receiverData != null) {
-                        PlayerManager.playerData = pkg.receiverData;
-                        ms.updateData();
-                    }
-
-                    ms.updateUsers(pkg.otherPlayers);
-                    ms.addMessages(pkg.newMessages);
-                    ms.updateStatus(pkg.playerStatus);
-                    ms.updateFriends(pkg.updateFriends);
-                    ms.updateIgnore(pkg.updateIgnore);
-                    ms.updateLocation(pkg.changeMapFromServer);
-                    ms.updateNPCs(pkg.updateNPCs);
-
-                    if (pkg.updateObjects != null)
-                        ms.updateObjects(pkg.updateObjects.sentWorldObjects);
-
-                }
-            }
-            else if(obj instanceof LoginResult){
-                LoginResult Lresult = (LoginResult)obj;
-
-                if(Lresult.result == LoginEnum.SUCCESS){
-                    PlayerManager.playerData = Lresult.data;
-                }
-                else if (Lresult.result == LoginEnum.FAIL){
-                    //Error wrong info
-                }
-            }
-            else if (obj instanceof ChangeScene){
-                ChangeScene cs = (ChangeScene)obj;
-                System.out.println("Changing scene to: " + cs.sceneName);
-                Runnable runnable = new SceneChangeRunnable(cs.sceneName, client);
-                Gdx.app.postRunnable(runnable);
-
-                if (Textiest.CurrentScene instanceof MainScene)
-                    ((MainScene) Textiest.CurrentScene).updateLocation();
-            }
-            else if (obj instanceof CreationRequest){
-                CreationRequest cr = (CreationRequest)obj;
-                PlayerManager.playerData = cr.playerData;
-
-                LoginRequest request = new LoginRequest();
-                request.Username = "testasssa";
-                request.Password = "testasssa";
-                client.sendTCP(request);
-            }
-
-
-        }
-
-        private void loginError(Connection connection, Object obj){
-            LoginError error = (LoginError)obj;
-            System.out.println("Error: " + error.ErrorMessage + " Error type: " + error.ErrorEnum);
-        }
-
-        private void SetUpID(ConnectionEstablished ce){
-            Textiest.uniqueConnectID = ce.UniqueConnectID;
-        }
-    }
-
-    public Client getClient() {
-        return client;
+        this.addListener(new ClientListener());
     }
 }

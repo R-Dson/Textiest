@@ -29,7 +29,7 @@ public abstract class Scene {
 
     public abstract void render(SpriteBatch batch);
 
-    public abstract void update(float delta);
+    public abstract void  update(float delta);
 
     public abstract void dispose();
 

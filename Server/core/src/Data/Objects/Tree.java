@@ -67,7 +67,7 @@ public class Tree extends WorldObject{
     {
         super.activity(userIdentity, objectActivity);
         try{
-            Item item = ServerClass.ItemManager.getItemFromList(this);
+            Item item = ServerClass.getController().getItemManager().getItemFromList(this);
             numberOfLogsLeft--;
             PlayerManager.AddItemToInventory(userIdentity, item);
 
@@ -94,7 +94,7 @@ public class Tree extends WorldObject{
     public boolean ChopLog(UserIdentity userIdentity)
     {
         try{
-            Item item = ServerClass.ItemManager.getItemFromList(this);
+            Item item = ServerClass.getController().getItemManager().getItemFromList(this);
             numberOfLogsLeft--;
             PlayerManager.AddItemToInventory(userIdentity, item);
 

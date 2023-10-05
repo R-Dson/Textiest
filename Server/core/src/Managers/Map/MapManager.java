@@ -2,6 +2,7 @@ package Managers.Map;
 
 import Components.Entities.MapEntity;
 import Data.FixedValues;
+import Managers.EntityManager;
 import Managers.FileManager;
 import Managers.Network.UserIdentity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -17,12 +18,14 @@ public class MapManager extends EntitySystem {
         MapList = FileManager.LoadMapsFromFile();
         for (Map map : MapList) {
             MapEntity MapEntity = new MapEntity(map);
+
             map.getConnectedMapsID().forEach(id -> {
                 getMapByID(id).addConnectMap(map);
                 map.addConnectMap(getMapByID(id));
             });
+
             mapEntities.add(MapEntity);
-            ServerClass.Engine.addEntity(MapEntity);
+            ServerClass.getEngine().addEntity(MapEntity);
         }
 
     }
@@ -46,30 +49,15 @@ public class MapManager extends EntitySystem {
     }
 
     public void AssignLogin(UserIdentity userIdentity){
-        String map;
-        if (userIdentity.playerData.LastMultiLocation == null)
-            map = FixedValues.DefaultMap;
-        else
+        String map = FixedValues.DefaultMap;
+        if (userIdentity.playerData.LastMultiLocation != null)
             map = userIdentity.playerData.LastMultiLocation;
         Map foundMap = GetMapByName(map);
         foundMap.AssignUserToLayer(userIdentity);
     }
 
-    public void MoveLoginToMap(UserIdentity userIdentity, Map newMap){
-        userIdentity.currentMap.MoveUserToNewMap(userIdentity, newMap);
-    }
-
-    public UserIdentity GetUserByConnectionID(int connectionID){
-        for (Map map: MapList) {
-            for (MapLayer layer: map.getMapLayers()) {
-                return layer.users.get(connectionID);
-            }
-        }
-        return null;
-    }
-
     public void RemoveUserByConnectionID(int connectionID){
-        UserIdentity userIdentity = GetUserByConnectionID(connectionID);
+        UserIdentity userIdentity = EntityManager.getUserIdentityByConnectID(connectionID);
         userIdentity.RemoveUserIdentityFromLayer();
     }
 }

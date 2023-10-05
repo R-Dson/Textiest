@@ -52,7 +52,7 @@ public class UserIdentity extends Entity {
         //Sets data
 
         Iterator<UserEvent> ui = updateEvents.iterator();
-        if (updateEvents.size() > 0)
+        if (!updateEvents.isEmpty())
         {
             while (ui.hasNext()) {
                 UserEvent e = ui.next();
@@ -60,8 +60,7 @@ public class UserIdentity extends Entity {
 
                 ui.remove();
             }
-
-            ServerClass.GameServer.getServer().sendToTCP(connectionID, updatePackage);
+            ServerClass.getController().getNetworkManager().getServer().sendToTCP(connectionID, updatePackage);
 
         }
 

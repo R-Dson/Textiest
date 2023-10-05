@@ -38,7 +38,7 @@ public class LoginScene extends Scene {
         _CameraManager = new CameraManager();
         _CameraManager.create();
 
-        client = Textiest.GameClient;
+        client = Textiest.client;
 
         final VisLabel userLabel = new VisLabel("Username");
         VisLabel pswLabel = new VisLabel("Password");
@@ -61,7 +61,7 @@ public class LoginScene extends Scene {
                     //request.Username = "t";
                     //request.Password = "t";
                     request.UniqueConnectID = Textiest.uniqueConnectID;
-                    client.getClient().sendTCP(request);
+                    client.sendTCP(request);
                 }
             }
         });
@@ -69,11 +69,11 @@ public class LoginScene extends Scene {
         register.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (client.getClient().isConnected()){
+                if (client.isConnected()){
                     RegisterRequest req = new RegisterRequest();
                     req.Username = "testasssa";
                     req.Password = "testasssa";
-                    client.getClient().sendTCP(req);
+                    client.sendTCP(req);
                     //TODO Change later to username text
 
                     /*LoginRequest request = new LoginRequest();
@@ -105,8 +105,8 @@ public class LoginScene extends Scene {
     }
 
     private boolean CheckConnection(){
-        if (client.getClient() == null) return false;
-        if (client.getClient().isConnected()) return true;
+        if (client == null) return false;
+        if (client.isConnected()) return true;
         return client.AttemptConnection();
     }
 

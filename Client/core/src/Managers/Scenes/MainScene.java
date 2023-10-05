@@ -15,6 +15,7 @@ import DataShared.Player.PlayerData;
 import Managers.CameraManager;
 import Managers.InputManager;
 import Managers.Map.MapManager;
+import Managers.Networking.NetworkManager;
 import Managers.PlayerManager;
 import Managers.UI.*;
 import com.badlogic.gdx.Gdx;
@@ -155,6 +156,7 @@ public class MainScene extends Scene {
 
             //Send data
             _Client.sendTCP(updatePackageToServer);
+
             chatWindow.clearMessages();
 
             //clear the current values in the dummy

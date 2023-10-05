@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 public class MapEntity extends Entity {
 
     public OrthographicCamera camera;
-    public OrthogonalTiledMapRenderer renderer;
+    // public OrthogonalTiledMapRenderer renderer;
     public Box2DDebugRenderer debugRenderer;
 
     public MapEntity(Map map){

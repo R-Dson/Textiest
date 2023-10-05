@@ -26,6 +26,7 @@ public class InputManager implements ApplicationListener, InputProcessor {
 
     }
 
+    /*
     public void Update(float delta){
         boolean found = false;
 
@@ -45,7 +46,7 @@ public class InputManager implements ApplicationListener, InputProcessor {
             KeyBindManager.queuedActions.clear();
         }
 
-    }
+    }*/
 
     @Override
     public void render() {
